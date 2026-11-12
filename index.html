@@ -340,7 +340,7 @@
             <div id="role-sidebar-desc" class="role-desc">Peserta Didik</div>
           </div>
         </div>
-        <button class="role-switch-btn" onclick="App.switchRole(NetLearnStore.state.currentRole === 'siswa' ? 'guru' : 'siswa')">
+        <button id="role-switch-sidebar-btn" class="role-switch-btn" style="display: none;" onclick="App.switchRole(NetLearnStore.state.currentRole === 'siswa' ? 'guru' : 'siswa')">
           Ganti Peran
         </button>
       </div>
@@ -486,7 +486,7 @@
 
         <div class="header-right">
           <!-- Role Switcher Toggle Pill -->
-          <div class="role-toggle-pill">
+          <div id="header-role-toggle-pill" class="role-toggle-pill" style="display: none;">
             <button id="role-pill-siswa" class="role-pill-btn active" onclick="App.switchRole('siswa')">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
               <span>Siswa</span>

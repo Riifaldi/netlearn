@@ -267,7 +267,17 @@ const App = {
     if (nameEl) nameEl.textContent = user.name;
     if (roleEl) roleEl.textContent = isGuru ? 'Guru Pengampu • SMK Negeri 3 Makassar' : `${user.nis ? 'NIS: ' + user.nis + ' • ' : ''}${user.kelas || 'XI TKJ 1'}`;
 
-    // Update pill switches
+    // Update pill switches & visibility (Siswa tidak boleh melihat tombol ganti peran)
+    const headerRoleToggle = document.getElementById('header-role-toggle-pill');
+    if (headerRoleToggle) {
+      headerRoleToggle.style.display = isGuru ? 'inline-flex' : 'none';
+    }
+
+    const roleSwitchSidebarBtn = document.getElementById('role-switch-sidebar-btn');
+    if (roleSwitchSidebarBtn) {
+      roleSwitchSidebarBtn.style.display = isGuru ? 'inline-block' : 'none';
+    }
+
     const btnSiswa = document.getElementById('role-pill-siswa');
     const btnGuru = document.getElementById('role-pill-guru');
     if (btnSiswa && btnGuru) {
@@ -293,6 +303,12 @@ const App = {
   },
 
   switchRole(targetRole) {
+    // Siswa tidak memiliki izin untuk berganti peran ke Guru tanpa otentikasi
+    if (targetRole === 'guru' && NetLearnStore.state.currentRole === 'siswa') {
+      showToast('Akses ditolak! Panel Guru memerlukan autentikasi login Guru / Instruktur.', 'error');
+      return;
+    }
+
     NetLearnStore.setRole(targetRole);
     this.updateUserBadge();
 
@@ -469,12 +485,14 @@ const App = {
             Bahan ajar lengkap berupa <strong>Slide PPT Presentasi</strong>, <strong>Dokumen Penjelasan Rinci (Word)</strong>, dan <strong>Video Tutorial YouTube</strong> akan otomatis tampil di sini segera setelah ditambahkan oleh Guru Pengampu melalui Panel CMS.
           </p>
           <div class="empty-actions">
-            <button class="btn btn-primary btn-lg" onclick="App.switchRole('guru'); App.navigateTo('guru-cms-materi');" style="display:inline-flex; align-items:center; gap:0.45rem;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-              <span>Beralih ke Panel Guru &amp; Kelola Materi</span>
-            </button>
+            ${isGuru ? `
+              <button class="btn btn-primary btn-lg" onclick="App.navigateTo('guru-cms-materi');" style="display:inline-flex; align-items:center; gap:0.45rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <span>Buka Panel Guru &amp; Kelola Materi</span>
+              </button>
+            ` : ''}
             <button class="btn btn-secondary btn-lg" onclick="App.loadSampleMateriFromCMS()">
-              Muat Contoh Materi Pengalamatan
+              Muat Contoh Materi Pengalamatan (Demo)
             </button>
           </div>
           <div class="empty-tips">

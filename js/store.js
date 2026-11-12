@@ -1156,284 +1156,386 @@ const NetLearnStore = {
   },
 
   // Template Contoh Materi (Bisa dimuat oleh Guru / Penguji dengan sekali klik)
+  // Template Contoh Materi (7 Modul Lengkap Sesuai Kurikulum Merdeka & Target CP/TP)
   sampleModulesData: [
-    {
-      id: 1,
-      title: "Konsep Dasar Pengalamatan Jaringan (IPv4)",
-      tpCode: "TP1",
-      subtitle: "Fondasi pengalamatan logis, analogi komunikasi data, format 32-bit, dan pemisahan Network ID vs Host ID.",
-      pptUrl: "", // Kosong -> mengaktifkan Slide Deck Interaktif bawaan
-      pptSlides: [
-        {
-          title: "Apa itu Pengalamatan Jaringan?",
-          subtitle: "Fondasi Utama Komunikasi Data Digital",
-          bullets: [
-            "Pengalamatan jaringan adalah identitas logis unik yang wajib dimiliki setiap perangkat (PC, Server, Router) di jaringan.",
-            "Setiap paket data membawa Alamat Pengirim (Source IP) dan Alamat Penerima (Destination IP).",
-            "Tanpa IP Address, perangkat switch dan router tidak dapat mengarahkan lalu lintas data ke tujuan yang tepat."
-          ],
-          highlight: "💡 Analogi Kantor Pos: Alamat IP bertindak layaknya nama jalan dan nomor rumah agar surat sampai ke tangan pemiliknya secara akurat!"
-        },
-        {
-          title: "Struktur & Format IPv4 (32-Bit)",
-          subtitle: "Pembagian 4 Blok Oktet Dotted-Decimal",
-          bullets: [
-            "IPv4 tersusun dari 32 digit bilangan biner (0 dan 1) dengan total 4.294.967.296 alamat di dunia.",
-            "Untuk memudahkan pembacaan manusia, 32 bit dibagi menjadi 4 oktet @ 8-bit yang dipisahkan titik.",
-            "Rentang angka per oktet adalah 0 sampai 255 (2^8 = 256 kombinasi)."
-          ],
-          highlight: "🔢 Contoh: IP 192.168.10.1 ditulis dalam biner = 11000000 . 10101000 . 00001010 . 00000001"
-        },
-        {
-          title: "Network ID vs Host ID",
-          subtitle: "Dua Komponen Wajib Setiap Alamat IP",
-          bullets: [
-            "Network ID: Alamat kelompok/segmen jaringan (identik dengan nama komplek perumahan).",
-            "Host ID: Nomor identitas unik perangkat individu di dalam kelompok tersebut (identik dengan nomor rumah).",
-            "Komputer dalam 1 laboratorium yang sama WAJIB memiliki Network ID identik dan Host ID berbeda."
-          ],
-          highlight: "⚡ Aturan Dasar: Dua komputer dengan Network ID berbeda TIDAK BISA saling bertukar data tanpa melalui Router (Default Gateway)!"
-        },
-        {
-          title: "Klasifikasi Kelas IP (A, B, C) & IP Privat",
-          subtitle: "Standar Pembagian Alamat Jaringan",
-          bullets: [
-            "Kelas A (1–126): Default mask /8 (255.0.0.0) — Jaringan skala raksasa (16 juta host/segmen).",
-            "Kelas B (128–191): Default mask /16 (255.255.0.0) — Jaringan skala menengah (65.534 host/segmen).",
-            "Kelas C (192–223): Default mask /24 (255.255.255.0) — Jaringan lokal LAN / Laboratorium SMK (254 host).",
-            "IP Privat RFC 1918 (192.168.x.x, 172.16.x.x, 10.x.x.x) digunakan gratis dan aman di jaringan internal sekolah."
-          ],
-          highlight: "🏫 Praktikum SMK: Kelas C Privat (192.168.1.x /24) adalah konfigurasi yang paling umum dipakai di lab sekolah."
-        }
-      ],
-      wordDetail: `
-        <div class="word-doc-paper">
-          <div class="word-doc-header">
-            <div class="doc-school-title">SMK NEGERI 3 MAKASSAR</div>
-            <div class="doc-meta-sub">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>
-            <div class="doc-meta-divider"></div>
-            <div class="doc-subject">MODUL AJAR: PENGALAMATAN JARINGAN KOMPUTER (IPv4)</div>
-            <div class="doc-badge-tp">SASARAN: TUJUAN PEMBELAJARAN 1 (TP1)</div>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB I: PENGERTIAN & FUNGSI PENGALAMATAN JARINGAN</h4>
-            <p>Pengalamatan jaringan (Network Addressing) merupakan mekanisme logis pengidentifikasian setiap node atau antarmuka jaringan (Network Interface Card/NIC) yang berpartisipasi dalam pertukaran data pada Layer 3 (Network Layer) model Open Systems Interconnection (OSI).</p>
-            <p>Berbeda dengan alamat fisik Media Access Control (MAC Address) yang terukir secara permanen pada chip hardware kartu jaringan, IP Address bersifat hierarkis dan logis, sehingga dapat diatur ulang sesuai segmentasi dan lokasi topologi jaringan.</p>
-            <div class="callout callout-info" style="margin: 1rem 0;">
-              <strong>Fungsi Pokok IP Address:</strong>
-              <ol style="margin-left: 1.25rem; margin-top: 0.25rem;">
-                <li>Sebagai alat identifikasi host atau antarmuka jaringan (Addressing).</li>
-                <li>Sebagai penentu rute pengiriman paket melintasi jaringan internet (Routing).</li>
-                <li>Memisahkan lalu lintas lokal dengan lalu lintas jaringan luar (Segmentasi).</li>
-              </ol>
-            </div>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB II: ANATOMI STRUKTUR BILANGAN 32-BIT</h4>
-            <p>IPv4 tersusun dari 32 bit biner yang dikelompokkan menjadi 4 oktet (masing-masing 8 bit). Notasi standar yang digunakan adalah <em>Dotted-Decimal Notation</em> (desimal bertitik), misalnya <code>192.168.10.1</code>.</p>
-            <p>Tiap bit memiliki bobot eksponensial basis 2:</p>
-            <div style="background: var(--color-bg-muted); padding: 0.75rem 1rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; margin: 0.75rem 0;">
-              Bit 7 = 128 | Bit 6 = 64 | Bit 5 = 32 | Bit 4 = 16<br>
-              Bit 3 = 8   | Bit 2 = 4  | Bit 1 = 2  | Bit 0 = 1
-            </div>
-            <p>Nilai maksimum sebuah oktet adalah ketika seluruh 8 bit bernilai 1 (11111111 biner = 128+64+32+16+8+4+2+1 = 255 desimal). Oleh karena itu, tidak ada angka oktet IPv4 yang melebihi 255.</p>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB III: PEMISAHAN NETWORK ID DAN HOST ID</h4>
-            <p>Setiap alamat IP secara matematis terbagi menjadi dua bagian mendasar:</p>
-            <ul>
-              <li><strong>Network Identifier (Net ID):</strong> Menandakan alamat kelompok jaringan tempat perangkat tersebut terhubung. Komputer yang berada di satu ruangan lab switch yang sama wajib memiliki Network ID yang identik.</li>
-              <li><strong>Host Identifier (Host ID):</strong> Menandakan nomor urut unik komputer di dalam kelompok network tersebut. Di dalam satu subnet, tidak boleh ada dua perangkat yang memiliki Host ID sama (karena akan memicu IP Conflict).</li>
-            </ul>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB IV: STUDI KASUS LABORATORIUM KOMPUTER SMK</h4>
-            <p>Di Laboratorium SMK Negeri 3 Makassar terdapat 30 PC Siswa dan 1 Server Guru yang terhubung ke satu unit Switch 48-port:</p>
-            <ul>
-              <li>IP Server Guru: <code>192.168.1.1</code> (Net ID: 192.168.1, Host ID: .1)</li>
-              <li>IP PC Siswa 01: <code>192.168.1.10</code> (Net ID: 192.168.1, Host ID: .10)</li>
-              <li>IP PC Siswa 02: <code>192.168.1.11</code> (Net ID: 192.168.1, Host ID: .11)</li>
-            </ul>
-            <p>Apabila PC Siswa 01 keliru diatur menjadi <code>192.168.2.10</code>, komputer tersebut tidak akan bisa saling ping dengan Server Guru karena berada pada Network ID yang berbeda.</p>
-          </div>
-        </div>
-      `,
-      wordFileUrl: "https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?usp=sharing",
-      wordFileName: "Modul_1_Pengalamatan_Jaringan_SMKN3.docx",
-      videoUrl: "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
-      videoTitle: "Tutorial Konsep Dasar Pengalamatan IP Address & Konversi Biner",
-      keyPoints: [
-        "Pengalamatan logis Layer 3 OSI untuk merutekan paket data.",
-        "IPv4 berukuran total 32 bit (4 oktet) dengan rentang tiap oktet 0-255.",
-        "Network ID mengidentifikasi segmen, Host ID mengidentifikasi perangkat.",
-        "Kelas C privat (192.168.x.x) adalah standar utama jaringan LAN sekolah."
-      ]
-    },
-    {
-      id: 2,
-      title: "Subnet Mask & Operasi Logika Bitwise AND",
-      tpCode: "TP3",
-      subtitle: "Fungsi batas pemisah Network ID vs Host ID serta mekanisme logika perkalian biner pada interface jaringan.",
-      pptUrl: "",
-      pptSlides: [
-        {
-          title: "Apa Fungsi Subnet Mask?",
-          subtitle: "Pemisah Tegas Antara Network ID dan Host ID",
-          bullets: [
-            "Subnet mask adalah deretan 32 bit yang bekerja berdampingan dengan IP Address.",
-            "Bit 1 kontinu menunjukkan porsi Network ID, sedangkan bit 0 menunjukkan porsi Host ID.",
-            "Subnet mask SELALU diawali deretan bit 1 tanpa terputus dari kiri ke kanan."
-          ],
-          highlight: "💡 Aturan Baku: Subnet mask tidak pernah memiliki bit 0 di tengah deretan bit 1!"
-        },
-        {
-          title: "Default Subnet Mask Tiap Kelas",
-          subtitle: "Standar Classful Subnet Mask",
-          bullets: [
-            "Kelas A: 255.0.0.0 (/8) — 8 bit network, 24 bit host.",
-            "Kelas B: 255.255.0.0 (/16) — 16 bit network, 16 bit host.",
-            "Kelas C: 255.255.255.0 (/24) — 24 bit network, 8 bit host."
-          ],
-          highlight: "🔢 Prefix Notasi (/x): Angka setelah garis miring menyatakan total bit 1 pada Subnet Mask."
-        },
-        {
-          title: "Operasi Logika Bitwise AND",
-          subtitle: "Mekanisme Komputer Menentukan Network Address",
-          bullets: [
-            "Komputer melakukan perkalian biner (AND) antara IP Address dan Subnet Mask.",
-            "Tabel Logika AND: 1 AND 1 = 1. Selain itu hasilnya SELALU 0.",
-            "Hasil operasi Bitwise AND adalah Network Address resmi dari segmen tersebut."
-          ],
-          highlight: "⚡ Contoh: IP 192.168.1.50 AND 255.255.255.0 menghasilkan Network ID 192.168.1.0!"
-        }
-      ],
-      wordDetail: `
-        <div class="word-doc-paper">
-          <div class="word-doc-header">
-            <div class="doc-school-title">SMK NEGERI 3 MAKASSAR</div>
-            <div class="doc-meta-sub">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI</div>
-            <div class="doc-meta-divider"></div>
-            <div class="doc-subject">MODUL AJAR: SUBNET MASK & OPERASI LOGIKA BITWISE AND</div>
-            <div class="doc-badge-tp">SASARAN: TUJUAN PEMBELAJARAN 3 (TP3)</div>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB I: DEFINISI DAN PERAN SUBNET MASK</h4>
-            <p>Subnet Mask adalah penanda 32-bit yang digunakan oleh protokol TCP/IP untuk menentukan apakah alamat IP tujuan berada di subnet lokal (sehingga paket dapat dikirim langsung melalui Switch) atau di jaringan jarak jauh (sehingga paket harus diarahkan ke Default Gateway/Router).</p>
-            <p>Bit 1 pada Subnet Mask menandai bagian Network ID, sedangkan bit 0 menandai bagian Host ID.</p>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB II: SIMULASI OPERASI BITWISE AND</h4>
-            <p>Katakanlah sebuah komputer memiliki IP <code>192.168.10.75</code> dengan Subnet Mask <code>255.255.255.192 (/26)</code>. Kartu jaringan (NIC) menghitung Network ID dengan cara:</p>
-            <pre style="background:var(--color-bg-muted); padding:1rem; border-radius:8px; font-family:var(--font-mono); font-size:0.85rem;">
-IP Address  : 192.168.10.75  -> 11000000.10101000.00001010.01001011
-Subnet Mask : 255.255.255.192 -> 11111111.11111111.11111111.11000000
----------------------------------------------------------------------- (AND)
-Network ID  : 192.168.10.64  -> 11000000.10101000.00001010.01000000
-            </pre>
-            <p>Dari perhitungan biner di atas, terbukti bahwa komputer tersebut berada pada subnet <strong>192.168.10.64/26</strong>.</p>
-          </div>
-        </div>
-      `,
-      wordFileUrl: "",
-      wordFileName: "Modul_2_Subnet_Mask_Bitwise.docx",
-      videoUrl: "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
-      videoTitle: "Tutorial Subnet Mask & Cara Kerja Logika Bitwise AND",
-      keyPoints: [
-        "Subnet mask memisahkan porsi Network ID (bit 1) dan Host ID (bit 0).",
-        "Operasi Bitwise AND menghasilkan Network Address resmi.",
-        "Prefix garis miring (/x) menunjukkan total bit 1 pada subnet mask."
-      ]
-    },
-    {
-      id: 3,
-      title: "Teknik Subnetting CIDR & Perencanaan VLSM",
-      tpCode: "TP2",
-      subtitle: "Rumus 2^x dan 2^y - 2, penentuan Magic Number, serta alokasi efisien multi-segmen dengan metode VLSM.",
-      pptUrl: "",
-      pptSlides: [
-        {
-          title: "Mengapa Perlu Subnetting?",
-          subtitle: "Efisiensi Alokasi & Keamanan Jaringan",
-          bullets: [
-            "Membagi satu jaringan besar menjadi beberapa sub-jaringan logis yang lebih kecil.",
-            "Meredam Broadcast Storm agar lalu lintas jaringan tidak macet/lelet.",
-            "Meningkatkan keamanan melalui pemisahan hak akses antar ruangan (Lab Siswa vs Ruang Guru)."
-          ],
-          highlight: "💡 Keuntungan: Menghemat alamat IP dan menyesuaikan kebutuhan riil setiap ruangan lab."
-        },
-        {
-          title: "Dua Rumus Utama Subnetting",
-          subtitle: "Rumus Baku Penentuan Subnet dan Host",
-          bullets: [
-            "Jumlah Subnet = 2^x (di mana x adalah banyaknya bit 1 yang dipinjam dari porsi host).",
-            "Jumlah Host Valid = 2^y - 2 (di mana y adalah banyaknya bit 0 yang tersisa untuk host).",
-            "Pengurangan 2 wajib dilakukan untuk Network Address (pertama) dan Broadcast Address (terakhir)."
-          ],
-          highlight: "🔢 Contoh /26: x=2 -> 4 Subnet. y=6 -> 2^6 - 2 = 62 Host per subnet."
-        },
-        {
-          title: "Aturan Emas Metode VLSM",
-          subtitle: "Variable Length Subnet Masking",
-          bullets: [
-            "VLSM memungkinkan penggunaan subnet mask yang berbeda-beda dalam satu jaringan induk.",
-            "ATURAN EMAS: Wajib mengurutkan kebutuhan host dari yang TERBESAR ke TERKECIL!",
-            "Mencegah terjadinya tumpang tindih alamat IP (Subnet Overlapping)."
-          ],
-          highlight: "🏆 Standar Industri: Digunakan pada konfigurasi jaringan Cisco, Mikrotik, dan perusahaan skala besar!"
-        }
-      ],
-      wordDetail: `
-        <div class="word-doc-paper">
-          <div class="word-doc-header">
-            <div class="doc-school-title">SMK NEGERI 3 MAKASSAR</div>
-            <div class="doc-meta-sub">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI</div>
-            <div class="doc-meta-divider"></div>
-            <div class="doc-subject">MODUL AJAR: TEKNIK SUBNETTING CIDR & PERENCANAAN VLSM</div>
-            <div class="doc-badge-tp">SASARAN: TUJUAN PEMBELAJARAN 2 (TP2)</div>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB I: TEKNIK PERHITUNGAN MAGIC NUMBER</h4>
-            <p>Magic Number adalah angka kelipatan blok subnet yang dihitung dengan rumus: <code>256 - Nilai Oktet Terakhir Subnet Mask</code>.</p>
-            <p>Contoh pada prefix <strong>/26 (255.255.255.192)</strong>:</p>
-            <ul>
-              <li>Magic Number = 256 - 192 = <strong>64</strong>.</li>
-              <li>Maka blok network dimulai dari kelipatan 64: 0, 64, 128, 192.</li>
-              <li>Subnet 1: 192.168.1.0 (Host: 192.168.1.1 - 192.168.1.62, Broadcast: 192.168.1.63)</li>
-              <li>Subnet 2: 192.168.1.64 (Host: 192.168.1.65 - 192.168.1.126, Broadcast: 192.168.1.127)</li>
-            </ul>
-          </div>
-
-          <div class="word-doc-section">
-            <h4>BAB II: PERENCANAAN MULTI-SEGMEN DENGAN VLSM</h4>
-            <p>Diberikan IP Induk <code>192.168.10.0/24</code> untuk 4 ruangan SMK Negeri 3 Makassar:</p>
-            <ol>
-              <li><strong>Lab RPL (58 Host):</strong> Memerlukan prefix <code>/26</code> (muat 62 host). Alokasi: 192.168.10.0/26.</li>
-              <li><strong>Lab Multimedia (26 Host):</strong> Memerlukan prefix <code>/27</code> (muat 30 host). Alokasi: 192.168.10.64/27.</li>
-              <li><strong>Ruang Guru (12 Host):</strong> Memerlukan prefix <code>/28</code> (muat 14 host). Alokasi: 192.168.10.96/28.</li>
-              <li><strong>Link Router WAN (2 Host):</strong> Memerlukan prefix <code>/30</code> (muat 2 host). Alokasi: 192.168.10.112/30.</li>
-            </ol>
-            <p>Dengan teknik VLSM, sisa IP dari 192.168.10.116 sampai .255 masih dapat dihemat untuk penambahan ruangan di masa depan!</p>
-          </div>
-        </div>
-      `,
-      wordFileUrl: "",
-      wordFileName: "Modul_3_Subnetting_VLSM_Lengkap.docx",
-      videoUrl: "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
-      videoTitle: "Tutorial Perhitungan Subnetting CIDR & Studi Kasus VLSM",
-      keyPoints: [
-        "Rumus subnet = 2^x, Rumus host valid = 2^y - 2.",
-        "Magic Number = 256 - Nilai Mask oktet aktif.",
-        "VLSM wajib mengurutkan kebutuhan host terbesar ke terkecil."
-      ]
-    }
-  ],
+  {
+    "id": 1,
+    "title": "Konsep Dasar Pengalamatan Jaringan (IPv4)",
+    "tpCode": "TP1",
+    "subtitle": "Fondasi pengalamatan logis, analogi komunikasi data, format 32-bit, dan pemisahan Network ID vs Host ID.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Apa itu Pengalamatan Jaringan?",
+        "subtitle": "Fondasi Utama Komunikasi Data Digital",
+        "bullets": [
+          "Pengalamatan jaringan adalah identitas logis unik yang wajib dimiliki setiap perangkat (PC, Server, Router) di jaringan.",
+          "Setiap paket data membawa Alamat Pengirim (Source IP) dan Alamat Penerima (Destination IP).",
+          "Tanpa IP Address, perangkat switch dan router tidak dapat mengarahkan lalu lintas data ke tujuan yang tepat."
+        ],
+        "highlight": "💡 Analogi Kantor Pos: Alamat IP bertindak layaknya nama jalan dan nomor rumah agar surat sampai ke tangan pemiliknya secara akurat!"
+      },
+      {
+        "title": "Struktur & Format IPv4 (32-Bit)",
+        "subtitle": "Pembagian 4 Blok Oktet Dotted-Decimal",
+        "bullets": [
+          "IPv4 tersusun dari 32 digit bilangan biner (0 dan 1) dengan total 4.294.967.296 alamat di dunia.",
+          "Untuk memudahkan pembacaan manusia, 32 bit dibagi menjadi 4 oktet @ 8-bit yang dipisahkan titik.",
+          "Rentang angka per oktet adalah 0 sampai 255 (2^8 = 256 kombinasi)."
+        ],
+        "highlight": "🔢 Contoh: IP 192.168.10.1 ditulis dalam biner = 11000000 . 10101000 . 00001010 . 00000001"
+      },
+      {
+        "title": "Network ID vs Host ID",
+        "subtitle": "Dua Komponen Wajib Setiap Alamat IP",
+        "bullets": [
+          "Network ID: Alamat kelompok/segmen jaringan (identik dengan nama komplek perumahan).",
+          "Host ID: Nomor identitas unik perangkat individu di dalam kelompok tersebut (identik dengan nomor rumah).",
+          "Komputer dalam 1 laboratorium yang sama WAJIB memiliki Network ID identik dan Host ID berbeda."
+        ],
+        "highlight": "⚡ Aturan Dasar: Dua komputer dengan Network ID berbeda TIDAK BISA saling bertukar data tanpa melalui Router (Default Gateway)!"
+      },
+      {
+        "title": "Klasifikasi Kelas IP (A, B, C) & IP Privat",
+        "subtitle": "Standar Pembagian Alamat Jaringan",
+        "bullets": [
+          "Kelas A (1–126): Default mask /8 (255.0.0.0) — Jaringan skala raksasa (16 juta host/segmen).",
+          "Kelas B (128–191): Default mask /16 (255.255.0.0) — Jaringan skala menengah (65.534 host/segmen).",
+          "Kelas C (192–223): Default mask /24 (255.255.255.0) — Jaringan lokal LAN / Laboratorium SMK (254 host).",
+          "IP Privat RFC 1918 (192.168.x.x, 172.16.x.x, 10.x.x.x) digunakan gratis dan aman di jaringan internal sekolah."
+        ],
+        "highlight": "🏫 Praktikum SMK: Kelas C Privat (192.168.1.x /24) adalah konfigurasi yang paling umum dipakai di lab sekolah."
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: PENGALAMATAN JARINGAN KOMPUTER (IPv4)</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 1 (TP1)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: PENGERTIAN & FUNGSI PENGALAMATAN JARINGAN</h4>\n          <p>Pengalamatan jaringan (Network Addressing) merupakan mekanisme logis pengidentifikasian setiap node atau antarmuka jaringan (Network Interface Card/NIC) yang berpartisipasi dalam pertukaran data pada Layer 3 (Network Layer) model Open Systems Interconnection (OSI).</p>\n          <p>Berbeda dengan alamat fisik Media Access Control (MAC Address) yang terukir secara permanen pada chip hardware kartu jaringan, IP Address bersifat hierarkis dan logis, sehingga dapat diatur ulang sesuai segmentasi dan lokasi topologi jaringan.</p>\n          <div class=\"callout callout-info\" style=\"margin: 1rem 0;\">\n            <strong>Fungsi Pokok IP Address:</strong>\n            <ol style=\"margin-left: 1.25rem; margin-top: 0.25rem;\">\n              <li>Sebagai alat identifikasi host atau antarmuka jaringan (Addressing).</li>\n              <li>Sebagai penentu rute pengiriman paket melintasi jaringan internet (Routing).</li>\n              <li>Memisahkan lalu lintas lokal dengan lalu lintas jaringan luar (Segmentasi).</li>\n            </ol>\n          </div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: ANATOMI STRUKTUR BILANGAN 32-BIT</h4>\n          <p>IPv4 tersusun dari 32 bit biner yang dikelompokkan menjadi 4 oktet (masing-masing 8 bit). Notasi standar yang digunakan adalah <em>Dotted-Decimal Notation</em> (desimal bertitik), misalnya <code>192.168.10.1</code>.</p>\n          <p>Tiap bit memiliki bobot eksponensial basis 2:</p>\n          <div style=\"background: var(--color-bg-muted); padding: 0.75rem 1rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; margin: 0.75rem 0;\">\n            Bit 7 = 128 | Bit 6 = 64 | Bit 5 = 32 | Bit 4 = 16<br>\n            Bit 3 = 8   | Bit 2 = 4  | Bit 1 = 2  | Bit 0 = 1\n          </div>\n          <p>Nilai maksimum sebuah oktet adalah ketika seluruh 8 bit bernilai 1 (11111111 biner = 128+64+32+16+8+4+2+1 = 255 desimal). Oleh karena itu, tidak ada angka oktet IPv4 yang melebihi 255.</p>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB III: PEMISAHAN NETWORK ID DAN HOST ID</h4>\n          <p>Setiap alamat IP secara matematis terbagi menjadi dua bagian mendasar:</p>\n          <ul>\n            <li><strong>Network Identifier (Net ID):</strong> Menandakan alamat kelompok jaringan tempat perangkat tersebut terhubung. Komputer yang berada di satu ruangan lab switch yang sama wajib memiliki Network ID yang identik.</li>\n            <li><strong>Host Identifier (Host ID):</strong> Menandakan nomor urut unik komputer di dalam kelompok network tersebut. Di dalam satu subnet, tidak boleh ada dua perangkat yang memiliki Host ID sama (karena akan memicu IP Conflict).</li>\n          </ul>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB IV: STUDI KASUS LABORATORIUM KOMPUTER SMK</h4>\n          <p>Di Laboratorium SMK Negeri 3 Makassar terdapat 30 PC Siswa dan 1 Server Guru yang terhubung ke satu unit Switch 48-port:</p>\n          <ul>\n            <li>IP Server Guru: <code>192.168.1.1</code> (Net ID: 192.168.1, Host ID: .1)</li>\n            <li>IP PC Siswa 01: <code>192.168.1.10</code> (Net ID: 192.168.1, Host ID: .10)</li>\n            <li>IP PC Siswa 02: <code>192.168.1.11</code> (Net ID: 192.168.1, Host ID: .11)</li>\n          </ul>\n          <p>Apabila PC Siswa 01 keliru diatur menjadi <code>192.168.2.10</code>, komputer tersebut tidak akan bisa saling ping dengan Server Guru karena berada pada Network ID yang berbeda.</p>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?usp=sharing",
+    "wordFileName": "Modul_1_Pengalamatan_Jaringan_SMKN3.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Konsep Dasar Pengalamatan IP Address & Konversi Biner",
+    "keyPoints": [
+      "Pengalamatan logis Layer 3 OSI untuk merutekan paket data.",
+      "IPv4 berukuran total 32 bit (4 oktet) dengan rentang tiap oktet 0-255.",
+      "Network ID mengidentifikasi segmen, Host ID mengidentifikasi perangkat.",
+      "Kelas C privat (192.168.x.x) adalah standar utama jaringan LAN sekolah."
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Representasi & Konversi Bilangan Biner",
+    "tpCode": "TP3",
+    "subtitle": "Sistem bilangan basis 2, bobot 8 bit (128 s.d. 1), teknik konversi biner-desimal dan desimal-biner untuk IPv4.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Mengapa Komputer Memakai Bilangan Biner?",
+        "subtitle": "Logika Transistor Digital (On dan Off)",
+        "bullets": [
+          "Komputer dan perangkat jaringan hanya memahami dua status elektrik: sinyal tegangan tinggi (1) dan tegangan rendah (0).",
+          "Setiap karakter, instruksi, dan alamat IP pada intinya disimpan sebagai aliran bit biner 0 dan 1.",
+          "Memahami biner adalah kunci utama menguasai Subnetting dan kalkulasi Subnet Mask."
+        ],
+        "highlight": "💡 Fakta: Alamat IP 192.168.1.1 yang kita ketik di laptop dibaca switch sebagai 32 digit biner murni!"
+      },
+      {
+        "title": "Tabel Nilai Bobot 8-Bit (Positional Value)",
+        "subtitle": "Fondasi Utama Perhitungan Konversi Satu Oktet",
+        "bullets": [
+          "Satu oktet terdiri atas 8 bit, dibaca dari bit paling kiri (Most Significant Bit / MSB) ke paling kanan (LSB).",
+          "Bobot tiap posisi berturut-turut: 2^7=128, 2^6=64, 2^5=32, 2^4=16, 2^3=8, 2^2=4, 2^1=2, 2^0=1.",
+          "Untuk mengubah biner ke desimal, cukup jumlahkan bobot pada bit-bit yang bernilai 1."
+        ],
+        "highlight": "🔢 Rumus Cepat Biner -> Desimal: 11000000 = 128 + 64 = 192!"
+      },
+      {
+        "title": "Metode Pengurangan Desimal ke Biner",
+        "subtitle": "Teknik Cepat Tanpa Kalkulator",
+        "bullets": [
+          "Bandingkan angka desimal dengan bobot dari kiri (128).",
+          "Jika angka >= bobot: tulis 1, kurangi angka dengan bobot.",
+          "Jika angka < bobot: tulis 0, lanjutkan ke bobot berikutnya.",
+          "Ulangi sampai bit terakhir (bobot 1) selesai dievaluasi."
+        ],
+        "highlight": "⚡ Contoh Konversi 168: 168>=128 (1, sisa 40), 40<64 (0), 40>=32 (1, sisa 8), 8<16 (0), 8>=8 (1, sisa 0) -> 10101000!"
+      },
+      {
+        "title": "Kombinasi Oktet Kritis Subnet Mask",
+        "subtitle": "8 Angka Sakti yang Wajib Dihapal Teknisi Jaringan",
+        "bullets": [
+          "/25 = 10000000 = 128",
+          "/26 = 11000000 = 192",
+          "/27 = 11100000 = 224",
+          "/28 = 11110000 = 240",
+          "/29 = 11111000 = 248",
+          "/30 = 11111100 = 252"
+        ],
+        "highlight": "🏆 Tip Ujian: Menguasai 6 angka ini membuat perhitungan subnetting selesai dalam hitungan detik!"
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: REPRESENTASI & KONVERSI BILANGAN BINER</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 3 (TP3)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: URGENSI BILANGAN BINER PADA IPv4</h4>\n          <p>Dalam komunikasi data jaringan komputer, seluruh paket informasi ditransmisikan dalam wujud bit biner (Binary Digit). Walaupun administrator jaringan mengonfigurasi perangkat menggunakan format desimal bertitik (seperti <code>192.168.1.1</code>), proses perutean (routing) dan pemfilteran paket oleh CPU router selalu dieksekusi dalam format biner 32 bit.</p>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: SISTEM NILAI TEMPAT OKTET 8-BIT</h4>\n          <p>Setiap oktet memiliki rentang nilai dari 0 (00000000) hingga 255 (11111111). Bobot eksponensial basis dua dari masing-masing bit adalah sebagai berikut:</p>\n          <table class=\"table-compact\" style=\"margin: 0.75rem 0; width: 100%; text-align: center;\">\n            <tr style=\"background: var(--color-bg-muted); font-weight: 700;\">\n              <td>Bit 7</td><td>Bit 6</td><td>Bit 5</td><td>Bit 4</td><td>Bit 3</td><td>Bit 2</td><td>Bit 1</td><td>Bit 0</td>\n            </tr>\n            <tr style=\"font-family: var(--font-mono); font-size: 0.95rem;\">\n              <td>128</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td>\n            </tr>\n          </table>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB III: PROSEDUR KONVERSI DUA ARAH</h4>\n          <p><strong>1. Konversi Biner ke Desimal:</strong> Jumlahkan nilai bobot tempat yang berisi angka 1.<br>\n          Contoh: <code>11010000 = 128 + 64 + 16 = 208</code>.</p>\n          <p><strong>2. Konversi Desimal ke Biner:</strong> Gunakan metode pengurangan bertingkat terhadap tabel bobot dari kiri ke kanan.<br>\n          Contoh konversi angka 170:<br>\n          - 170 >= 128 -> Bit=1, sisa 42<br>\n          - 42 < 64    -> Bit=0<br>\n          - 42 >= 32  -> Bit=1, sisa 10<br>\n          - 10 < 16   -> Bit=0<br>\n          - 10 >= 8   -> Bit=1, sisa 2<br>\n          - 2 < 4     -> Bit=0<br>\n          - 2 >= 2    -> Bit=1, sisa 0<br>\n          - 0 < 1     -> Bit=0<br>\n          Hasil biner = <code>10101010</code>.</p>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "",
+    "wordFileName": "Modul_2_Representasi_Biner_IPv4.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Konversi Biner ke Desimal & Desimal ke Biner untuk Subnetting",
+    "keyPoints": [
+      "Satu oktet IPv4 terdiri atas 8 bit bernilai bobot 128, 64, 32, 16, 8, 4, 2, 1.",
+      "Nilai desimal maksimum satu oktet adalah 255 (seluruh bit 1).",
+      "Kombinasi biner oktet mask menentukan batas segmentasi jaringan."
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Struktur Oktet & Klasifikasi Alamat IP (Kelas A, B, C)",
+    "tpCode": "TP1",
+    "subtitle": "Arsitektur classful addressing, rentang oktet pertama, alokasi IP privat RFC 1918 vs IP publik.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Arsitektur Classful Addressing",
+        "subtitle": "Sistem Pengelompokan Bersejarah Alamat IPv4",
+        "bullets": [
+          "Pada era awal ARPANET, alamat IPv4 diklasifikasikan ke dalam kelas-kelas kaku: A, B, C, D, dan E.",
+          "Klasifikasi ditentukan oleh pola bit-bit pertama pada oktet pertama.",
+          "Kelas A untuk institusi global besar, Kelas B untuk kampus/korporasi menengah, Kelas C untuk jaringan lokal kecil."
+        ],
+        "highlight": "💡 Aturan: Kelas A dimulai bit '0', Kelas B dimulai bit '10', Kelas C dimulai bit '110'!"
+      },
+      {
+        "title": "Rentang & Batas Oktet Pertama Tiap Kelas",
+        "subtitle": "Mengetahui Kelas Hanya dengan Membaca Oktet Pertama",
+        "bullets": [
+          "Kelas A: 1.0.0.0 s.d. 126.255.255.255 (Default Subnet Mask 255.0.0.0 /8).",
+          "Kelas B: 128.0.0.0 s.d. 191.255.255.255 (Default Subnet Mask 255.255.0.0 /16).",
+          "Kelas C: 192.0.0.0 s.d. 223.255.255.255 (Default Subnet Mask 255.255.255.0 /24).",
+          "Kelas D (224-239) untuk Multicast, Kelas E (240-255) untuk Eksperimental."
+        ],
+        "highlight": "🔢 Angka 127: Direservasi secara khusus untuk fungsi Loopback Diagnostic (127.0.0.1) dan bukan untuk host!"
+      },
+      {
+        "title": "Alamat IP Privat (RFC 1918) vs IP Publik",
+        "subtitle": "Menjaga Keamanan dan Menghemat Alamat Global",
+        "bullets": [
+          "IP Publik: Alamat berbayar terdaftar di IANA/APNIC yang dapat diakses langsung dari seluruh dunia melalui internet.",
+          "IP Privat: Alamat yang bebas digunakan gratis di jaringan LAN internal tanpa lisensi.",
+          "Rentang Privat: 10.0.0.0/8 (Kelas A), 172.16.0.0/12 (Kelas B), 192.168.0.0/16 (Kelas C).",
+          "Perangkat dengan IP Privat membutuhkan NAT (Network Address Translation) pada router untuk berselancar di internet."
+        ],
+        "highlight": "🛡️ Keamanan: Router internet di seluruh dunia secara otomatis memblokir paket ber-IP privat yang melintas keluar!"
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: KLASIFIKASI KELAS ALAMAT IP & IP PRIVAT</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 1 (TP1)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: PEMBAGIAN KELAS CLASSFUL IPv4</h4>\n          <p>Sebelum notasi CIDR diadopsi secara luas, alamat IPv4 dipartisi ke dalam 5 kelas berdasarkan nilai oktet pertamanya:</p>\n          <ul>\n            <li><strong>Kelas A (1 - 126):</strong> Format Net.Host.Host.Host. Menyediakan 126 network dengan masing-masing 16.777.214 host valid.</li>\n            <li><strong>Kelas B (128 - 191):</strong> Format Net.Net.Host.Host. Menyediakan 16.384 network dengan masing-masing 65.534 host valid.</li>\n            <li><strong>Kelas C (192 - 223):</strong> Format Net.Net.Net.Host. Menyediakan 2.097.152 network dengan masing-masing 254 host valid.</li>\n          </ul>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: STANDAR IP PRIVAT RFC 1918</h4>\n          <p>Untuk menghemat alokasi IPv4 global yang kian menipis, Internet Engineering Task Force (IETF) menetapkan RFC 1918 yang mencadangkan 3 blok alamat privat yang tidak boleh dirutekan di internet publik:</p>\n          <ol>\n            <li>10.0.0.0 - 10.255.255.255 (Prefix 10.0.0.0/8)</li>\n            <li>172.16.0.0 - 172.31.255.255 (Prefix 172.16.0.0/12)</li>\n            <li>192.168.0.0 - 192.168.255.255 (Prefix 192.168.0.0/16)</li>\n          </ol>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "",
+    "wordFileName": "Modul_3_Klasifikasi_Kelas_IP_SMKN3.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Klasifikasi Kelas IP Address A, B, C dan Standar RFC 1918",
+    "keyPoints": [
+      "Rentang oktet pertama menentukan kelas: A (1-126), B (128-191), C (192-223).",
+      "Alamat 127.0.0.1 digunakan untuk pengujian loopback stack TCP/IP internal.",
+      "IP privat RFC 1918 bebas digunakan pada LAN sekolah tanpa registrasi IANA."
+    ]
+  },
+  {
+    "id": 4,
+    "title": "Subnet Mask & Operasi Logika Bitwise AND",
+    "tpCode": "TP3",
+    "subtitle": "Fungsi batas pemisah Network ID vs Host ID serta mekanisme logika perkalian biner pada interface jaringan.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Apa Fungsi Subnet Mask?",
+        "subtitle": "Pemisah Tegas Antara Network ID dan Host ID",
+        "bullets": [
+          "Subnet mask adalah deretan 32 bit yang bekerja berdampingan dengan IP Address.",
+          "Bit 1 kontinu menunjukkan porsi Network ID, sedangkan bit 0 menunjukkan porsi Host ID.",
+          "Subnet mask SELALU diawali deretan bit 1 tanpa terputus dari kiri ke kanan."
+        ],
+        "highlight": "💡 Aturan Baku: Subnet mask tidak pernah memiliki bit 0 di tengah deretan bit 1!"
+      },
+      {
+        "title": "Default Subnet Mask Tiap Kelas",
+        "subtitle": "Standar Classful Subnet Mask",
+        "bullets": [
+          "Kelas A: 255.0.0.0 (/8) — 8 bit network, 24 bit host.",
+          "Kelas B: 255.255.0.0 (/16) — 16 bit network, 16 bit host.",
+          "Kelas C: 255.255.255.0 (/24) — 24 bit network, 8 bit host."
+        ],
+        "highlight": "🔢 Prefix Notasi (/x): Angka setelah garis miring menyatakan total bit 1 pada Subnet Mask."
+      },
+      {
+        "title": "Operasi Logika Bitwise AND",
+        "subtitle": "Mekanisme Komputer Menentukan Network Address",
+        "bullets": [
+          "Komputer melakukan perkalian biner (AND) antara IP Address dan Subnet Mask.",
+          "Tabel Logika AND: 1 AND 1 = 1. Selain itu hasilnya SELALU 0.",
+          "Hasil operasi Bitwise AND adalah Network Address resmi dari segmen tersebut."
+        ],
+        "highlight": "⚡ Contoh: IP 192.168.1.50 AND 255.255.255.0 menghasilkan Network ID 192.168.1.0!"
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: SUBNET MASK & OPERASI LOGIKA BITWISE AND</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 3 (TP3)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: DEFINISI DAN PERAN SUBNET MASK</h4>\n          <p>Subnet Mask adalah penanda 32-bit yang digunakan oleh protokol TCP/IP untuk menentukan apakah alamat IP tujuan berada di subnet lokal (sehingga paket dapat dikirim langsung melalui Switch) atau di jaringan jarak jauh (sehingga paket harus diarahkan ke Default Gateway/Router).</p>\n          <p>Bit 1 pada Subnet Mask menandai bagian Network ID, sedangkan bit 0 menandai bagian Host ID.</p>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: SIMULASI OPERASI BITWISE AND</h4>\n          <p>Katakanlah sebuah komputer memiliki IP <code>192.168.10.75</code> dengan Subnet Mask <code>255.255.255.192 (/26)</code>. Kartu jaringan (NIC) menghitung Network ID dengan cara:</p>\n          <pre style=\"background:var(--color-bg-muted); padding:1rem; border-radius:8px; font-family:var(--font-mono); font-size:0.85rem;\">\nIP Address  : 192.168.10.75  -> 11000000.10101000.00001010.01001011\nSubnet Mask : 255.255.255.192 -> 11111111.11111111.11111111.11000000\n---------------------------------------------------------------------- (AND)\nNetwork ID  : 192.168.10.64  -> 11000000.10101000.00001010.01000000\n          </pre>\n          <p>Dari perhitungan biner di atas, terbukti bahwa komputer tersebut berada pada subnet <strong>192.168.10.64/26</strong>.</p>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "",
+    "wordFileName": "Modul_4_Subnet_Mask_Bitwise.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Subnet Mask & Cara Kerja Logika Bitwise AND",
+    "keyPoints": [
+      "Subnet mask memisahkan porsi Network ID (bit 1) dan Host ID (bit 0).",
+      "Operasi Bitwise AND menghasilkan Network Address resmi.",
+      "Prefix garis miring (/x) menunjukkan total bit 1 pada subnet mask."
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Classless Inter-Domain Routing (CIDR)",
+    "tpCode": "TP2",
+    "subtitle": "Peralihan dari classful ke classless, notasi garis miring prefix (/x), tabel konversi subnet mask fleksibel.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Latar Belakang CIDR (RFC 1519)",
+        "subtitle": "Solusi Menghapus Keterbatasan Sistem Kelas",
+        "bullets": [
+          "Sistem kelas lama sangat boros: jika butuh 300 komputer, harus mengambil Kelas B (65.534 host), membuang 65.000+ IP!",
+          "CIDR diperkenalkan tahun 1993 untuk memungkinkan alokasi prefix dengan ukuran bit bebas.",
+          "Mengizinkan perutean fleksibel berbasis batas bit apapun (arbitrary prefix length)."
+        ],
+        "highlight": "💡 Keunggulan CIDR: Jaringan dapat dipotong sesuai kebutuhan presisi tanpa terikat kelas A, B, atau C!"
+      },
+      {
+        "title": "Notasi Prefix Garis Miring (/Slash)",
+        "subtitle": "Menulis Subnet Mask Secara Lebih Efisien dan Ringkas",
+        "bullets": [
+          "Notasi CIDR dituliskan dengan tanda garis miring (/) diikuti jumlah bit bernilai 1.",
+          "Contoh: 255.255.255.0 memiliki 24 bit 1 kontinu, ditulis sebagai /24.",
+          "Jika bit 1 bertambah 2 bit menjadi 26 bit 1, ditulis /26 (255.255.255.192)."
+        ],
+        "highlight": "🔢 Konsep: Setiap penambahan 1 bit prefix (/24 ke /25) akan membelah ukuran jaringan menjadi separuhnya!"
+      },
+      {
+        "title": "Tabel Pemetaan Prefix /24 sampai /30",
+        "subtitle": "Standar Segmentasi Praktik Jaringan SMK",
+        "bullets": [
+          "/24 = 255.255.255.0 (254 host valid)",
+          "/25 = 255.255.255.128 (126 host valid)",
+          "/26 = 255.255.255.192 (62 host valid)",
+          "/27 = 255.255.255.224 (30 host valid)",
+          "/28 = 255.255.255.240 (14 host valid)",
+          "/29 = 255.255.255.248 (6 host valid)",
+          "/30 = 255.255.255.252 (2 host valid — Link Point-to-Point)"
+        ],
+        "highlight": "⚡ Penting: Prefix /31 dan /32 tidak menyediakan host valid untuk komunikasi standar jaringan LAN!"
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: CLASSLESS INTER-DOMAIN ROUTING (CIDR)</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 2 (TP2)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: KONSEP CLASSLESS ADDRESSING</h4>\n          <p>Classless Inter-Domain Routing (CIDR) adalah metode alokasi alamat IP yang menggantikan sistem pembagian kelas tradisional. Dalam CIDR, pemisahan antara Network ID dan Host ID tidak lagi terpaku pada batas kelipatan 8 bit (oktet), melainkan dapat terjadi pada bit mana saja dari 32 bit yang ada.</p>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: ANALISIS EFISIENSI ALOKASI</h4>\n          <p>Jika sebuah sekolah membutuhkan jaringan untuk 50 komputer:</p>\n          <ul>\n            <li>Dengan sistem classful: Wajib memakai Kelas C (/24 = 254 host), terdapat pemborosan 204 IP.</li>\n            <li>Dengan sistem CIDR: Cukup menggunakan prefix <code>/26</code> (kapasitas 62 host), pemborosan dapat ditekan hanya menjadi 12 IP.</li>\n          </ul>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "",
+    "wordFileName": "Modul_5_CIDR_Konsep_Prefix.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Konsep CIDR Notasi Prefix & Pemetaan Subnet Mask",
+    "keyPoints": [
+      "CIDR mengatasi kelangkaan alamat IPv4 dengan fleksibilitas pembagian bit.",
+      "Notasi prefix /x menunjukkan total bit network yang bernilai 1.",
+      "Prefix /26 cocok untuk lab 60 PC, prefix /30 khusus untuk link 2 router."
+    ]
+  },
+  {
+    "id": 6,
+    "title": "Perhitungan Subnetting & Magic Number",
+    "tpCode": "TP3",
+    "subtitle": "Rumus matematis 2^x dan 2^y - 2, penentuan Magic Number (interval blok), rentang IP host valid, dan broadcast address.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Dua Rumus Sakti Subnetting",
+        "subtitle": "Menghitung Jumlah Subnet dan Jumlah Host Valid",
+        "bullets": [
+          "Jumlah Subnet = 2^x, di mana x adalah banyaknya bit 1 yang dipinjam dari host.",
+          "Jumlah Host Valid = 2^y - 2, di mana y adalah sisa bit 0 yang digunakan untuk host.",
+          "Pengurangan 2 wajib dilakukan karena ada 2 alamat terlarang yang tidak boleh dipasang pada PC."
+        ],
+        "highlight": "💡 Alamat Terlarang: Alamat Pertama = Network Address, Alamat Terakhir = Broadcast Address!"
+      },
+      {
+        "title": "Metode Cepat 'Magic Number'",
+        "subtitle": "Menemukan Kelipatan Blok Subnet Tanpa Rumus Rumit",
+        "bullets": [
+          "Magic Number dihitung dengan rumus: 256 dikurangi nilai oktet aktif Subnet Mask.",
+          "Contoh pada /26 (mask 255.255.255.192): Magic Number = 256 - 192 = 64.",
+          "Artinya, tiap subnet melompat dengan kelipatan 64: 0, 64, 128, 192."
+        ],
+        "highlight": "🔢 Blok Subnet /26: Subnet #1 dimulai dari .0, Subnet #2 dari .64, Subnet #3 dari .128, Subnet #4 dari .192!"
+      },
+      {
+        "title": "Menentukan Rentang Host dan Broadcast",
+        "subtitle": "4 Elemen Wajib pada Setiap Blok Subnet",
+        "bullets": [
+          "1. Network ID: Alamat awal blok (hasil kelipatan Magic Number).",
+          "2. Host Pertama: Network ID + 1 (biasanya dipakai untuk IP Gateway/Router).",
+          "3. Host Terakhir: Broadcast ID - 1 (IP valid terakhir untuk PC siswa).",
+          "4. Broadcast ID: Satu angka sebelum Network ID blok berikutnya."
+        ],
+        "highlight": "⚡ Contoh Subnet 192.168.1.64/26: Net=192.168.1.64, Host=192.168.1.65 s.d. 192.168.1.126, Broadcast=192.168.1.127!"
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: PERHITUNGAN SUBNETTING & MAGIC NUMBER</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 3 (TP3)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: TEKNIK PERHITUNGAN MAGIC NUMBER</h4>\n          <p>Magic Number adalah interval selisih antar-blok subnet yang memudahkan teknisi merancang tabel pengalamatan. Rumus umumnya adalah: <code>Magic Number = 256 - Nilai Mask Oktet Aktif</code>.</p>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: STUDI KASUS SUBNETTING /27 (255.255.255.224)</h4>\n          <p>Diberikan network <code>192.168.5.0/27</code>:</p>\n          <ul>\n            <li>Jumlah bit dipinjam (x) = 27 - 24 = 3 bit -> Jumlah subnet = 2^3 = <strong>8 Subnet</strong>.</li>\n            <li>Sisa bit host (y) = 32 - 27 = 5 bit -> Host per subnet = 2^5 - 2 = <strong>30 Host Valid</strong>.</li>\n            <li>Magic Number = 256 - 224 = <strong>32</strong>.</li>\n            <li>Daftar Subnet:\n              <br>1. 192.168.5.0/27 (Host: 192.168.5.1 - .30, Broadcast: 192.168.5.31)\n              <br>2. 192.168.5.32/27 (Host: 192.168.5.33 - .62, Broadcast: 192.168.5.63)\n              <br>3. 192.168.5.64/27 (Host: 192.168.5.65 - .94, Broadcast: 192.168.5.95)\n              <br>... dan seterusnya hingga subnet ke-8.\n            </li>\n          </ul>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "",
+    "wordFileName": "Modul_6_Perhitungan_Subnetting_MagicNumber.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Trik Cepat Perhitungan Subnetting dan Magic Number",
+    "keyPoints": [
+      "Rumus jumlah subnet adalah 2^x (x = bit dipinjam).",
+      "Rumus host valid adalah 2^y - 2 (y = bit host).",
+      "Magic Number = 256 - nilai subnet mask oktet aktif."
+    ]
+  },
+  {
+    "id": 7,
+    "title": "Variable Length Subnet Masking (VLSM)",
+    "tpCode": "TP2",
+    "subtitle": "Strategi alokasi subnet bertingkat dengan prefix bervariasi untuk penghematan alamat IP maksimal tanpa konflik.",
+    "pptUrl": "",
+    "pptSlides": [
+      {
+        "title": "Kelemahan Subnetting Tradisional (FLSM)",
+        "subtitle": "Fixed Length Subnet Masking",
+        "bullets": [
+          "Pada FLSM, seluruh subnet dipaksa memakai subnet mask yang sama besar.",
+          "Jika satu ruang butuh 60 host dan ruang lain butuh 2 host, keduanya diberi blok yang sama (misal /26 = 62 host).",
+          "Akibatnya: Terjadi pemborosan 60 alamat IP pada tautan router point-to-point!"
+        ],
+        "highlight": "💡 Solusi: VLSM memungkinkan penggunaan subnet mask yang berbeda-beda sesuai kebutuhan riil masing-masing segmen!"
+      },
+      {
+        "title": "Aturan Emas Perancangan VLSM",
+        "subtitle": "Hukum Wajib yang Tidak Boleh Dilanggar",
+        "bullets": [
+          "ATURAN EMAS: Selalu urutkan kebutuhan host dari yang TERBESAR ke TERKECIL!",
+          "Jika alokasi tidak diurutkan dari yang terbesar, pasti akan terjadi tumpang tindih alamat (Overlapping).",
+          "Tentukan prefix minimum yang mencukupi masing-masing kebutuhan (2^y - 2 >= Kebutuhan)."
+        ],
+        "highlight": "🏆 Urutan Alokasi: Lab 1 (55 PC) -> Lab 2 (25 PC) -> Ruang Guru (10 PC) -> Link Router (2 PC)!"
+      },
+      {
+        "title": "Prosedur Alokasi Bertingkat Berkelanjutan",
+        "subtitle": "Menyambung Blok Subnet Tanpa Celah yang Bertabrakan",
+        "bullets": [
+          "Blok pertama dialokasikan untuk kebutuhan terbesar mulai dari network awal.",
+          "Blok kedua dimulai tepat dari alamat setelah Broadcast ID blok pertama.",
+          "Lanjutkan proses sampai semua ruangan dan link router selesai terpetakan.",
+          "Sisa IP yang belum terpakai dapat dicadangkan untuk ekspansi di masa mendatang."
+        ],
+        "highlight": "⚡ Hasil: Efisiensi pengalamatan mencapai lebih dari 90% dengan kehandalan topologi maksimal!"
+      }
+    ],
+    "wordDetail": "\n      <div class=\"word-doc-paper\">\n        <div class=\"word-doc-header\">\n          <div class=\"doc-school-title\">SMK NEGERI 3 MAKASSAR</div>\n          <div class=\"doc-meta-sub\">PROGRAM KEAHLIAN TEKNIK JARINGAN KOMPUTER & TELEKOMUNIKASI (TJKT)</div>\n          <div class=\"doc-meta-divider\"></div>\n          <div class=\"doc-subject\">MODUL AJAR: VARIABLE LENGTH SUBNET MASKING (VLSM)</div>\n          <div class=\"doc-badge-tp\">SASARAN: TUJUAN PEMBELAJARAN 2 (TP2)</div>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB I: PRINSIP DASAR METODE VLSM</h4>\n          <p>Variable Length Subnet Masking (VLSM) adalah teknik subnetting tingkat lanjut di mana subnet mask yang digunakan dalam satu jaringan dapat memiliki panjang prefix yang berbeda-beda. Hal ini memungkinkan segmentasi jaringan disesuaikan secara presisi dengan kebutuhan nyata setiap divisi atau ruangan.</p>\n        </div>\n\n        <div class=\"word-doc-section\">\n          <h4>BAB II: STUDI KASUS TOPOLOGI SMK NEGERI 3 MAKASSAR</h4>\n          <p>Diberikan Network Induk <code>192.168.10.0/24</code> untuk 4 segmen:</p>\n          <ol>\n            <li><strong>Lab RPL (58 Host):</strong> Kebutuhan 58 -> Butuh kapasitas 62 host (Prefix <code>/26</code>).<br>\n            Alokasi: <code>192.168.10.0/26</code> (Host: .1 - .62, Broadcast: .63).</li>\n            <li><strong>Lab Multimedia (26 Host):</strong> Kebutuhan 26 -> Butuh kapasitas 30 host (Prefix <code>/27</code>).<br>\n            Alokasi: <code>192.168.10.64/27</code> (Host: .65 - .94, Broadcast: .95).</li>\n            <li><strong>Ruang Guru (12 Host):</strong> Kebutuhan 12 -> Butuh kapasitas 14 host (Prefix <code>/28</code>).<br>\n            Alokasi: <code>192.168.10.96/28</code> (Host: .97 - .110, Broadcast: .111).</li>\n            <li><strong>Link Router WAN (2 Host):</strong> Kebutuhan 2 -> Butuh kapasitas 2 host (Prefix <code>/30</code>).<br>\n            Alokasi: <code>192.168.10.112/30</code> (Host: .113 - .114, Broadcast: .115).</li>\n          </ol>\n          <p>Sisa IP dari <code>192.168.10.116</code> sampai <code>192.168.10.255</code> tetap utuh dan dapat digunakan untuk segmen baru.</p>\n        </div>\n      </div>\n    ",
+    "wordFileUrl": "",
+    "wordFileName": "Modul_7_Perancangan_VLSM_Lengkap.docx",
+    "videoUrl": "https://www.youtube.com/watch?v=BWZ-MHIhqjA",
+    "videoTitle": "Tutorial Perancangan VLSM Multi-Subnet Tanpa Overlapping",
+    "keyPoints": [
+      "VLSM memungkinkan penggunaan prefix bervariasi dalam satu jaringan induk.",
+      "Aturan Emas: Wajib mengurutkan kebutuhan host dari yang terbesar ke terkecil.",
+      "Mencegah pemborosan IP address pada segmen skala kecil dan link point-to-point."
+    ]
+  }
+],
 
   // 10 Latihan Soal Interaktif Bawaan (Default Standar Kurikulum)
   defaultLatihanQuestions: [
