@@ -116,9 +116,13 @@ const NetLearnStore = {
       this.seedDefaultData();
     }
 
-    // Pastikan modulesData selalu array terdefinisi
-        // Auto-migrate legacy placeholder video URLs to valid verified streaming videos
-    if (Array.isArray(this.state.modulesData)) {
+    // Pastikan modulesData selalu terisi 7 modul lengkap kurikulum agar seluruh siswa di komputer mana pun dapat langsung belajar
+    if (!Array.isArray(this.state.modulesData) || this.state.modulesData.length === 0) {
+      this.state.modulesData = JSON.parse(JSON.stringify(this.sampleModulesData));
+      this.state.materiProgress = this.state.modulesData.map((_, i) => i === 0);
+      this.save();
+    } else {
+      // Auto-migrate legacy placeholder video URLs to valid verified streaming videos
       const validLinks = [
         'https://www.youtube.com/watch?v=M11SvDtPBhA',
         'https://www.youtube.com/watch?v=M11SvDtPBhA',
@@ -137,11 +141,19 @@ const NetLearnStore = {
       });
       if (hasLegacy) this.save();
     }
-    if (!Array.isArray(this.state.modulesData)) {
-      this.state.modulesData = [];
+
+    if (!Array.isArray(this.state.materiProgress) || this.state.materiProgress.length === 0) {
+      this.state.materiProgress = this.state.modulesData.map((_, i) => i === 0);
     }
-    if (!Array.isArray(this.state.materiProgress)) {
-      this.state.materiProgress = [];
+
+    // Pastikan Bank Soal Latihan & Evaluasi selalu tersedia untuk seluruh siswa
+    if (!Array.isArray(this.state.bankSoalLatihan) || this.state.bankSoalLatihan.length === 0) {
+      this.state.bankSoalLatihan = JSON.parse(JSON.stringify(this.defaultLatihanQuestions));
+      this.save();
+    }
+    if (!this.state.bankSoalEvaluasi || !Array.isArray(this.state.bankSoalEvaluasi.pgList) || this.state.bankSoalEvaluasi.pgList.length === 0) {
+      this.state.bankSoalEvaluasi = JSON.parse(JSON.stringify(this.defaultEvaluasiData));
+      this.save();
     }
 
     // Pastikan data siswa awal tersedia jika kosong
@@ -788,9 +800,9 @@ const NetLearnStore = {
       }
     ];
 
-    // Secara default materi kosong (sesuai permintaan user)
-    this.state.modulesData = [];
-    this.state.materiProgress = [];
+    // Muat 7 modul pembelajaran lengkap standar Kurikulum Merdeka agar langsung bisa diakses oleh seluruh siswa di setiap komputer
+    this.state.modulesData = JSON.parse(JSON.stringify(this.sampleModulesData));
+    this.state.materiProgress = this.state.modulesData.map((_, i) => i === 0);
     this.state.bankSoalLatihan = JSON.parse(JSON.stringify(this.defaultLatihanQuestions));
     this.state.bankSoalEvaluasi = JSON.parse(JSON.stringify(this.defaultEvaluasiData));
   },
