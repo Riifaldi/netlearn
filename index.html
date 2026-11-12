@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetLearn — Platform Pembelajaran & Simulasi Pengalamatan Jaringan (SMK Negeri 3 Makassar)</title>
+  <meta name="description" content="Aplikasi web pembelajaran interaktif & simulator pengalamatan jaringan (IP Address, Subnetting, CIDR, VLSM) untuk siswa kelas XI SMK Negeri 3 Makassar dengan arsitektur dua peran (Siswa & Guru).">
+  
+  <!-- Google Fonts: Plus Jakarta Sans, Inter & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/modules.css">
+</head>
+<body>
+
+  <!-- ====================================================================
+       AUTHENTICATION / LOGIN OVERLAY (SISWA & GURU)
+       ==================================================================== -->
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-wrapper">
+      
+      <!-- Kolom Kiri: Branding & Informasi Platform -->
+      <div class="login-hero-pane">
+        <div class="login-hero-content">
+          <div class="login-hero-brand">
+            <div class="login-hero-logo">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+              </svg>
+            </div>
+            <div>
+              <div class="brand-title">NetLearn</div>
+              <div class="brand-sub">SMK Negeri 3 Makassar</div>
+            </div>
+          </div>
+
+          <div class="login-hero-badge">Kurikulum Merdeka &bull; Fase F (XI TJKT)</div>
+          <h2 class="login-hero-title">Sistem Multimedia Pengalamatan &amp; Subnetting IPv4</h2>
+          <p class="login-hero-desc">
+            Platform pembelajaran multimedia interaktif untuk penguasaan konsep IPv4, kalkulasi subnetting biner, notasi CIDR, dan simulasi topologi jaringan.
+          </p>
+
+          <div class="login-features-list">
+            <div class="login-feature-item">
+              <span class="feat-check">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              <span>Slide Presentasi Materi &amp; Dokumen Modul Lengkap (.docx)</span>
+            </div>
+            <div class="login-feature-item">
+              <span class="feat-check">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              <span>Kalkulator Subnetting Biner &amp; Simulator Topologi Uji Ping</span>
+            </div>
+            <div class="login-feature-item">
+              <span class="feat-check">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              <span>Latihan Soal Adaptif &amp; Evaluasi Bersertifikat Digital</span>
+            </div>
+            <div class="login-feature-item">
+              <span class="feat-check">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              <span>Panel Sinkronisasi Guru &amp; Manajemen Nilai Terpusat</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-hero-footer">
+          <span>Program Keahlian Teknik Komputer &amp; Telekomunikasi &bull; PTIK FT UNM</span>
+        </div>
+      </div>
+
+      <!-- Kolom Kanan: Card Form Login & Registrasi -->
+      <div class="login-form-pane">
+        
+        <!-- Tab Mode Utama: Masuk vs Daftar -->
+        <div class="auth-mode-tabs">
+          <button id="auth-mode-login" type="button" class="auth-mode-btn active" onclick="App.setAuthMode('login')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span>Masuk</span>
+          </button>
+          <button id="auth-mode-register" type="button" class="auth-mode-btn" onclick="App.setAuthMode('register')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+            <span>Daftar Akun</span>
+          </button>
+        </div>
+
+        <!-- Role Tabs Switcher: Siswa vs Guru -->
+        <div class="login-role-tabs">
+          <button id="tab-btn-siswa" type="button" class="login-role-tab active" onclick="App.switchLoginRole('siswa')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+            <span>Portal Siswa</span>
+          </button>
+          <button id="tab-btn-guru" type="button" class="login-role-tab guru-tab" onclick="App.switchLoginRole('guru')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <span>Portal Guru</span>
+          </button>
+        </div>
+
+        <!-- Alert Error Message -->
+        <div id="login-error-msg" class="login-error-alert" style="display: none;"></div>
+
+        <!-- 1. VIEW: MASUK SISWA -->
+        <div id="auth-view-login-siswa">
+          <form onsubmit="App.handleLoginSiswa(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-siswa-nis">Nomor Induk Siswa (NIS)</label>
+              <input type="text" id="login-siswa-nis" class="form-control" placeholder="Masukkan NIS Anda (Contoh: 22101)" required autocomplete="username">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.35rem;">
+              <label class="form-label" for="login-siswa-pass">Kata Sandi</label>
+              <input type="password" id="login-siswa-pass" class="form-control" placeholder="Masukkan kata sandi akun" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth-submit">
+              <span>Masuk ke Ruang Belajar</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+
+            <div class="auth-switch-link-row">
+              Belum memiliki akun siswa?
+              <button type="button" class="auth-switch-link-btn" onclick="App.setAuthMode('register'); App.switchLoginRole('siswa');">
+                Daftar Sekarang
+              </button>
+            </div>
+
+            <!-- Quick Test Accounts Siswa -->
+            <div class="quick-accounts-wrap">
+              <div class="quick-accounts-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Akses Cepat Pengujian (1-Klik)</span>
+              </div>
+              <div class="quick-chips-row">
+                <button type="button" class="quick-chip-btn" onclick="App.quickLoginSiswa('22101', '123')" title="Masuk sebagai Ahmad Fadil (Siswa)">
+                  <span class="chip-dot"></span>
+                  <span class="chip-label">Ahmad Fadil</span>
+                  <span class="chip-sub">22101</span>
+                </button>
+                <button type="button" class="quick-chip-btn" onclick="App.quickLoginSiswa('22102', '123')" title="Masuk sebagai Nur Anisa (Siswa)">
+                  <span class="chip-dot"></span>
+                  <span class="chip-label">Nur Anisa</span>
+                  <span class="chip-sub">22102</span>
+                </button>
+                <button type="button" class="quick-chip-btn" onclick="App.quickLoginSiswa('210209501001', '123')" title="Masuk sebagai Rifaldi">
+                  <span class="chip-dot"></span>
+                  <span class="chip-label">Rifaldi</span>
+                  <span class="chip-sub">210209501001</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- 2. VIEW: DAFTAR SISWA BARU -->
+        <div id="auth-view-register-siswa" style="display: none;">
+          <form onsubmit="App.handleRegisterSiswa(event)">
+            <div class="form-group">
+              <label class="form-label" for="reg-siswa-name">Nama Lengkap Siswa</label>
+              <input type="text" id="reg-siswa-name" class="form-control" placeholder="Contoh: Muhammad Rezky" required autocomplete="name">
+            </div>
+
+            <div class="grid-two-equal" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="reg-siswa-nis">Nomor Induk Siswa (NIS)</label>
+                <input type="text" id="reg-siswa-nis" class="form-control" placeholder="Contoh: 22108" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-siswa-kelas">Kelas</label>
+                <select id="reg-siswa-kelas" class="form-control">
+                  <option value="XI TKJ 1" selected>XI TKJ 1</option>
+                  <option value="XI TKJ 2">XI TKJ 2</option>
+                  <option value="XI TKJ 3">XI TKJ 3</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-two-equal" style="gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="reg-siswa-pass">Kata Sandi Baru</label>
+                <input type="password" id="reg-siswa-pass" class="form-control" placeholder="Minimal 3 karakter" required autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-siswa-pass-confirm">Ulangi Sandi</label>
+                <input type="password" id="reg-siswa-pass-confirm" class="form-control" placeholder="Ketik ulang kata sandi" required autocomplete="new-password">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth-submit">
+              <span>Daftarkan Akun Siswa</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+
+            <div class="auth-switch-link-row">
+              Sudah memiliki akun siswa?
+              <button type="button" class="auth-switch-link-btn" onclick="App.setAuthMode('login'); App.switchLoginRole('siswa');">
+                Masuk Di Sini
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 3. VIEW: MASUK GURU -->
+        <div id="auth-view-login-guru" style="display: none;">
+          <form onsubmit="App.handleLoginGuru(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-guru-nip">NIP atau Username Pengajar</label>
+              <input type="text" id="login-guru-nip" class="form-control" placeholder="198504122010011008 atau guru" required autocomplete="username">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.35rem;">
+              <label class="form-label" for="login-guru-pass">Kata Sandi Guru</label>
+              <input type="password" id="login-guru-pass" class="form-control" placeholder="Masukkan kata sandi guru" required autocomplete="current-password">
+              <span style="font-size: 0.73rem; color: var(--color-text-muted); display: block; margin-top: 0.35rem;">
+                Kredensial bawaan: Username: <code>guru</code> &bull; Sandi: <code>guru123</code>
+              </span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth-submit btn-auth-guru">
+              <span>Masuk ke Panel Pengajar</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+
+            <div class="auth-switch-link-row">
+              Guru baru di SMK Negeri 3?
+              <button type="button" class="auth-switch-link-btn" onclick="App.setAuthMode('register'); App.switchLoginRole('guru');">
+                Registrasi Akun Guru
+              </button>
+            </div>
+
+            <!-- Quick Test Account Guru -->
+            <div class="quick-accounts-wrap">
+              <div class="quick-accounts-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Akses Cepat Pengujian Guru (1-Klik)</span>
+              </div>
+              <div class="quick-chips-row">
+                <button type="button" class="quick-chip-btn quick-chip-guru" onclick="App.quickLoginGuru()" title="Masuk sebagai Bpk. Rifaldi (Guru Pengampu)">
+                  <span class="chip-dot chip-dot-purple"></span>
+                  <span class="chip-label">Bpk. Rifaldi, S.Pd., M.T.</span>
+                  <span class="chip-sub">Guru Pengampu</span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- 4. VIEW: DAFTAR GURU BARU -->
+        <div id="auth-view-register-guru" style="display: none;">
+          <form onsubmit="App.handleRegisterGuru(event)">
+            <div class="form-group">
+              <label class="form-label" for="reg-guru-name">Nama Lengkap &amp; Gelar</label>
+              <input type="text" id="reg-guru-name" class="form-control" placeholder="Contoh: Siti Hajar, S.Pd., M.Kom." required autocomplete="name">
+            </div>
+
+            <div class="grid-two-equal" style="gap: 0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="reg-guru-nip">NIP / Kode Identitas</label>
+                <input type="text" id="reg-guru-nip" class="form-control" placeholder="Contoh: 199008152015022003" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-guru-code">Kode Otorisasi Sekolah</label>
+                <input type="text" id="reg-guru-code" class="form-control" placeholder="Kode verifikasi: SMK3BISA" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-guru-mapel">Mata Pelajaran Pengampu</label>
+              <input type="text" id="reg-guru-mapel" class="form-control" value="Perencanaan &amp; Pengalamatan Jaringan (TJKT)" required>
+            </div>
+
+            <div class="grid-two-equal" style="gap: 0.75rem; margin-bottom: 1.25rem;">
+              <div class="form-group">
+                <label class="form-label" for="reg-guru-pass">Kata Sandi Baru</label>
+                <input type="password" id="reg-guru-pass" class="form-control" placeholder="Minimal 4 karakter" required autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reg-guru-pass-confirm">Ulangi Sandi</label>
+                <input type="password" id="reg-guru-pass-confirm" class="form-control" placeholder="Ketik ulang kata sandi" required autocomplete="new-password">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-auth-submit btn-auth-guru">
+              <span>Daftarkan Akun Pengajar</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+
+            <div class="auth-switch-link-row">
+              Sudah memiliki akun pengajar?
+              <button type="button" class="auth-switch-link-btn" onclick="App.setAuthMode('login'); App.switchLoginRole('guru');">
+                Masuk Di Sini
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div id="app-shell">
+    
+    <!-- ====================================================================
+         1. Left Navigation Sidebar
+         ==================================================================== -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon-wrap">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h2>NetLearn</h2>
+          <div class="brand-sub">Platform Pengalamatan Jaringan</div>
+        </div>
+      </div>
+
+      <!-- Role Badge Pill in Sidebar -->
+      <div class="role-badge-sidebar">
+        <div class="role-info">
+          <div class="role-status-dot"></div>
+          <div>
+            <div id="role-sidebar-title" class="role-title">Mode Siswa</div>
+            <div id="role-sidebar-desc" class="role-desc">Peserta Didik</div>
+          </div>
+        </div>
+        <button class="role-switch-btn" onclick="App.switchRole(NetLearnStore.state.currentRole === 'siswa' ? 'guru' : 'siswa')">
+          Ganti Peran
+        </button>
+      </div>
+
+      <!-- Navigation Links Container -->
+      <div class="sidebar-nav-container">
+        
+        <!-- Siswa Navigation Section -->
+        <div class="nav-section-label">Alur Belajar Siswa</div>
+        <ul class="nav-list">
+          <li>
+            <button class="nav-item-btn active" data-screen="beranda" onclick="App.navigateTo('beranda')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H4a1 1 0 0 1-1-1V9.5z"/></svg></span>
+              <span>1. Beranda</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="tujuan" onclick="App.navigateTo('tujuan')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+              <span>2. Tujuan Belajar</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="materi" onclick="App.navigateTo('materi')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+              <span>3. Materi Interaktif</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="simulasi" onclick="App.navigateTo('simulasi')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg></span>
+              <span>4. Simulasi Jaringan</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="latihan" onclick="App.navigateTo('latihan')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+              <span>5. Latihan Soal</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="evaluasi" onclick="App.navigateTo('evaluasi')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></span>
+              <span>6. Evaluasi Akhir</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="hasil" onclick="App.navigateTo('hasil')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
+              <span>7. Hasil Belajar</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-screen="refleksi" onclick="App.navigateTo('refleksi')">
+              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              <span>8. Refleksi Belajar</span>
+            </button>
+          </li>
+        </ul>
+
+        <!-- Guru / Admin Exclusive Navigation Section -->
+        <div id="sidebar-guru-section" style="display: none; margin-top: 1rem;">
+          <div class="nav-section-label" style="color: #A78BFA;">Panel Guru (CMS & Data)</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn" data-screen="guru-dashboard" onclick="App.navigateTo('guru-dashboard')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+                <span>Dashboard Guru</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="guru-cms-materi" onclick="App.navigateTo('guru-cms-materi')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+                <span>Kelola Materi (CMS)</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="guru-bank-soal" onclick="App.navigateTo('guru-bank-soal')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
+                <span>Bank Soal & Ujian</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="guru-laporan" onclick="App.navigateTo('guru-laporan')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 11h6M9 15h6M9 19h3"/></svg></span>
+                <span>Laporan Nilai Kelas</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="guru-refleksi" onclick="App.navigateTo('guru-refleksi')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+                <span>Rekap Refleksi Siswa</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="guru-database" onclick="App.navigateTo('guru-database')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
+                <span>Pusat Database</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Logout Action in Sidebar -->
+      <div style="padding: 0 1rem 0.75rem 1rem;">
+        <button class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.06); color: #CBD5E1; border-color: rgba(255,255,255,0.12); display: flex; align-items: center; gap: 0.4rem;" onclick="App.logout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Keluar Akun</span>
+        </button>
+      </div>
+
+      <!-- Sidebar School Brand Footer -->
+      <div class="sidebar-footer">
+        <div class="school-tag">
+          <div class="school-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+          </div>
+          <div class="school-text">
+            <strong>SMK Negeri 3 Makassar</strong>
+            <span>Kelompok 8 PTIK FT UNM</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         2. Main Application Wrapper & Top Header
+         ==================================================================== -->
+    <div id="main-wrapper">
+      
+      <!-- Top Sticky Header -->
+      <header id="top-header">
+        <div class="header-left">
+          <div class="breadcrumbs">
+            <span class="breadcrumb-link" onclick="App.navigateTo('beranda')">NetLearn</span>
+            <span class="breadcrumb-separator">/</span>
+            <span id="header-breadcrumb-text" class="breadcrumb-current">Beranda</span>
+          </div>
+          <h1 id="header-screen-title" class="header-title-text">Beranda Pembelajaran</h1>
+        </div>
+
+        <div class="header-right">
+          <!-- Role Switcher Toggle Pill -->
+          <div class="role-toggle-pill">
+            <button id="role-pill-siswa" class="role-pill-btn active" onclick="App.switchRole('siswa')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+              <span>Siswa</span>
+            </button>
+            <button id="role-pill-guru" class="role-pill-btn guru" onclick="App.switchRole('guru')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+              <span>Guru / Admin</span>
+            </button>
+          </div>
+
+          <!-- User Profile Display -->
+          <div class="user-profile-badge" onclick="App.logout()" title="Klik untuk keluar / ganti akun" style="cursor: pointer;">
+            <div id="user-avatar-display" class="user-avatar">S</div>
+            <div class="user-info">
+              <span id="user-name-display" class="user-name">Ahmad Fadil</span>
+              <span id="user-role-display" class="user-role-text">XI TKJ 1 SMK Negeri 3 Makassar</span>
+            </div>
+          </div>
+
+          <!-- Tombol Keluar (Logout) -->
+          <button class="btn btn-secondary btn-sm" onclick="App.logout()" title="Keluar dari akun saat ini" style="font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Keluar</span>
+          </button>
+
+          <!-- Quick Actions & Reset Button -->
+          <button class="header-action-btn" title="Reset Ulang Data Sesi Belajar" onclick="if(confirm('Reset semua data progres dan kembali ke awal?')) NetLearnStore.resetAll();">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- ====================================================================
+           3. Content Container (All 8 Screens + Admin Panels)
+           ==================================================================== -->
+      <main id="content-container">
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 1: Beranda (Home)
+             ------------------------------------------------------------------ -->
+        <section id="screen-beranda" class="screen-view active">
+          
+          <!-- Hero Banner -->
+          <div class="hero-banner">
+            <div class="hero-content">
+              <div class="hero-badge">
+                <span>SMK Negeri 3 Makassar</span> • <span>Companion App Cisco Packet Tracer</span>
+              </div>
+              <h2 class="hero-title">
+                Kuasai Perencanaan & Pengalamatan <span>Jaringan Komputer</span>
+              </h2>
+              <p class="hero-desc">
+                Pelajari konsep pembagian bit biner, perhitungan Subnet Mask, notasi CIDR, dan alokasi VLSM secara bertahap dan interaktif sebelum melakukan simulasi konfigurasi perangkat di laboratorium.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-primary btn-lg" onclick="App.navigateTo('materi')">
+                  <span>Mulai Belajar</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="App.navigateTo('simulasi')">
+                  <span>Buka Simulator</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="hero-graphic">
+              <div class="hero-network-card">
+                <div class="network-pill">
+                  <div class="network-pill-icon"></div>
+                  <span>IP: 192.168.10.0/26</span>
+                </div>
+                <div style="font-size: 0.75rem; color: #94A3B8;">Subnet: 255.255.255.192</div>
+                <div style="font-size: 0.75rem; color: #38BDF8;">Host Valid: .1 s/d .62 (62 Host)</div>
+                <div style="font-size: 0.72rem; color: #34D399; font-weight:600;">Status: Router Connected (Aktif)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5 Quick Access Cards -->
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem; color: var(--color-primary); letter-spacing: -0.01em;">
+            Pintasan Menu Pembelajaran
+          </h3>
+          <div class="quick-access-grid">
+            
+            <div class="quick-card" style="--card-color: #2563EB; --card-bg-light: #EFF6FF;" onclick="App.navigateTo('materi')">
+              <div class="quick-card-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+              <h4 class="quick-card-title">1. Materi Interaktif</h4>
+              <p class="quick-card-desc">Pelajari 7 modul terstruktur: Pengalamatan, Biner, IP, Subnet Mask, CIDR, Subnetting, dan VLSM.</p>
+              <div class="quick-card-link">Baca Materi →</div>
+            </div>
+
+            <div class="quick-card" style="--card-color: #0284C7; --card-bg-light: #E0F2FE;" onclick="App.navigateTo('simulasi')">
+              <div class="quick-card-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg></div>
+              <h4 class="quick-card-title">2. Simulator Jaringan</h4>
+              <p class="quick-card-desc">Kalkulator subnetting otomatis & kanvas topologi drag-and-drop dengan uji ICMP Ping.</p>
+              <div class="quick-card-link">Buka Simulasi →</div>
+            </div>
+
+            <div class="quick-card" style="--card-color: #16A34A; --card-bg-light: #DCFCE7;" onclick="App.navigateTo('latihan')">
+              <div class="quick-card-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+              <h4 class="quick-card-title">3. Latihan 10 Soal</h4>
+              <p class="quick-card-desc">Uji pemahaman dengan umpan balik instan kode warna dan rincian langkah perhitungan.</p>
+              <div class="quick-card-link">Mulai Latihan →</div>
+            </div>
+
+            <div class="quick-card" style="--card-color: #7C3AED; --card-bg-light: #F3E8FF;" onclick="App.navigateTo('evaluasi')">
+              <div class="quick-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></div>
+              <h4 class="quick-card-title">4. Evaluasi Akhir</h4>
+              <p class="quick-card-desc">Ujian evaluasi 20 butir (15 PG + 5 Uraian) berdurasi 30 menit dengan ambang kelulusan KKM 75.</p>
+              <div class="quick-card-link">Ikuti Ujian →</div>
+            </div>
+
+            <div class="quick-card" style="--card-color: #D97706; --card-bg-light: #FEF3C7;" onclick="App.navigateTo('hasil')">
+              <div class="quick-card-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+              <h4 class="quick-card-title">5. Hasil Belajar</h4>
+              <p class="quick-card-desc">Pantau statistik capaian kompetensi, jalur adaptif remedial/pengayaan, & unduh sertifikat.</p>
+              <div class="quick-card-link">Lihat Nilai →</div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Grid: Progress & Petunjuk Penggunaan -->
+          <div class="home-info-grid">
+            
+            <div class="card" style="padding: 1.75rem;">
+              <div class="card-title" style="margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                <span>Progres Capaian Belajar Anda</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.25rem;">
+                Sistem secara otomatis melacak submateri yang telah Anda pelajari dan tugas yang diselesaikan.
+              </p>
+
+              <div class="progress-bar-container" style="margin-bottom: 1.5rem;">
+                <div class="progress-header">
+                  <span>Penyelesaian 7 Modul Materi</span>
+                  <span id="beranda-progress-ratio">1 dari 7 Modul (14%)</span>
+                </div>
+                <div class="progress-bar-track">
+                  <div id="beranda-progress-fill" class="progress-bar-fill" style="width: 14%;"></div>
+                </div>
+              </div>
+
+              <div class="grid-three-col" style="gap: 0.75rem;">
+                <div class="calc-card-metric">
+                  <span class="metric-label">Latihan Soal</span>
+                  <span class="metric-val" style="color: #16A34A; font-size:1rem;">10 Soal</span>
+                  <span class="metric-bin">Umpan Balik Instan</span>
+                </div>
+                <div class="calc-card-metric">
+                  <span class="metric-label">Batas KKM</span>
+                  <span class="metric-val" style="color: #2563EB; font-size:1rem;">75 Poin</span>
+                  <span class="metric-bin">Standar Kelulusan</span>
+                </div>
+                <div class="calc-card-metric">
+                  <span class="metric-label">Sertifikat</span>
+                  <span class="metric-val" style="color: #7C3AED; font-size:1rem;">Digital</span>
+                  <span class="metric-bin">Bila Nilai ≥ 75</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Petunjuk Penggunaan (PRD Screen 1 Requirement) -->
+            <div class="card" style="padding: 1.75rem;">
+              <div class="card-title" style="margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                <span>Petunjuk Penggunaan Media</span>
+              </div>
+              <p style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">
+                Ikuti langkah pembelajaran berikut agar proses praktik jaringan berjalan lancar:
+              </p>
+              
+              <div class="guide-step-item">
+                <div class="guide-step-num">1</div>
+                <div class="guide-step-content">
+                  <h4>Pelajari Teori Dasar</h4>
+                  <p>Buka Materi Interaktif, pahami sistem bilangan dan rumus subnetting.</p>
+                </div>
+              </div>
+
+              <div class="guide-step-item">
+                <div class="guide-step-num">2</div>
+                <div class="guide-step-content">
+                  <h4>Eksperimen di Simulator</h4>
+                  <p>Gunakan Kalkulator Subnet dan rangkai topologi jaringan di kanvas.</p>
+                </div>
+              </div>
+
+              <div class="guide-step-item">
+                <div class="guide-step-num">3</div>
+                <div class="guide-step-content">
+                  <h4>Evaluasi & Refleksi</h4>
+                  <p>Kerjakan ujian akhir evaluasi dan isi lembar refleksi pembelajaran Anda.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 2: Tujuan Pembelajaran (CP & TP)
+             ------------------------------------------------------------------ -->
+        <section id="screen-tujuan" class="screen-view">
+          
+          <div class="cp-banner">
+            <div class="cp-label">Capaian Pembelajaran (CP Fase F - Bidang Keahlian TJKT)</div>
+            <p class="cp-text">
+              "Pada akhir fase F, peserta didik mampu merencanakan topologi dan pengalamatan jaringan, menerapkan teknik subnetting dan CIDR/VLSM pada jaringan komputer lokal maupun luas, serta menguji konektivitas pengalamatan perangkat jaringan secara mandiri dan bertanggung jawab."
+            </p>
+          </div>
+
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 1.2rem; letter-spacing: -0.01em;">
+            Daftar 3 Tujuan Pembelajaran (TP1 – TP3)
+          </h3>
+
+          <div id="tp-cards-container" class="tp-card-grid"></div>
+
+          <div class="card" style="padding: 1.4rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+            <div>
+              <h4 style="color: var(--color-accent); font-size: 1.02rem; font-weight: 700;">Siap Memulai Penguasaan Kompetensi?</h4>
+              <p style="color: var(--color-text-muted); font-size: 0.86rem; margin-top: 0.2rem;">
+                Materi disusun bertahap dari dasar hingga studi kasus VLSM nyata.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-lg" onclick="App.navigateTo('materi')" style="flex-shrink: 0;">
+              Mulai Materi Interaktif →
+            </button>
+          </div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 3: Materi Interaktif (Dinamis Terhubung dengan CMS Guru)
+             Paling Menonjol: Presentasi PPT, Tombol Penjelasan Rinci (Word), Link YouTube
+             ------------------------------------------------------------------ -->
+        <section id="screen-materi" class="screen-view">
+          
+          <!-- Dynamic Content Mount: Dikendalikan secara dinamis oleh App.renderMateri() -->
+          <div id="materi-dynamic-mount"></div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 4: Simulasi (Mode 1 Kalkulator Subnet + Mode 2 Topologi)
+             ------------------------------------------------------------------ -->
+        <section id="screen-simulasi" class="screen-view">
+          
+          <!-- Mode Tabs Switcher -->
+          <div class="simulasi-tabs-header">
+            <button id="sim-mode-calc-btn" class="simulasi-mode-btn active" onclick="App.switchSimulasiMode('calc')">
+              <div class="mode-icon"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"/></svg></div>
+              <div>
+                <div class="mode-title">Mode 1: Kalkulator Subnetting & CIDR</div>
+                <div class="mode-subtitle">Hitung Network, Mask, Wildcard, Host Range, dan Perencanaan VLSM</div>
+              </div>
+            </button>
+
+            <button id="sim-mode-topo-btn" class="simulasi-mode-btn" onclick="App.switchSimulasiMode('topo')">
+              <div class="mode-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+              <div>
+                <div class="mode-title">Mode 2: Simulator Topologi & Uji Ping</div>
+                <div class="mode-subtitle">Rakit perangkat (Router, Switch, PC), atur IP, & uji paket di kanvas</div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Mode 1: Subnetting Calculator View -->
+          <div id="sim-view-calc">
+            <div class="calc-grid">
+              
+              <!-- Input Form Card -->
+              <div class="card" style="padding: 1.75rem;">
+                <h3 class="card-title" style="margin-bottom: 1.25rem; display:flex; align-items:center; gap:0.5rem;">
+                  <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                  <span>Parameter Kalkulasi Subnet</span>
+                </h3>
+
+                <div class="form-group">
+                  <label class="form-label">Alamat IPv4 (Dotted-Decimal):</label>
+                  <input type="text" id="calc-ip-input" class="form-control" value="192.168.10.15" placeholder="Contoh: 192.168.10.1" oninput="App.processSubnetCalculation()">
+                  <div class="form-help">Mendukung semua kelas IPv4 (A, B, C) dengan deteksi bit otomatis.</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Prefix CIDR / Subnet Mask:</label>
+                  <select id="calc-prefix-select" class="form-control" onchange="App.handlePrefixSelectChange(this.value)">
+                    <option value="24">/24 (255.255.255.0 - 254 Host)</option>
+                    <option value="25">/25 (255.255.255.128 - 126 Host)</option>
+                    <option value="26" selected>/26 (255.255.255.192 - 62 Host)</option>
+                    <option value="27">/27 (255.255.255.224 - 30 Host)</option>
+                    <option value="28">/28 (255.255.255.240 - 14 Host)</option>
+                    <option value="29">/29 (255.255.255.248 - 6 Host)</option>
+                    <option value="30">/30 (255.255.255.252 - 2 Host Point-to-Point)</option>
+                    <option value="16">/16 (255.255.0.0 - Kelas B Default)</option>
+                    <option value="8">/8 (255.0.0.0 - Kelas A Default)</option>
+                  </select>
+                </div>
+
+                <!-- Live Range Slider for Students -->
+                <div class="slider-container">
+                  <div class="slider-header">
+                    <span>Geser Prefix CIDR (Real-time):</span>
+                    <span id="slider-prefix-val" class="slider-val-badge">/26</span>
+                  </div>
+                  <input type="range" id="calc-prefix-slider" class="custom-range-slider" min="8" max="30" value="26" oninput="App.handlePrefixSliderInput(this.value)">
+                </div>
+
+                <!-- Presets for Vocational/SMK Scenarios -->
+                <div class="preset-container">
+                  <div class="preset-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <span>Studi Kasus Praktikum Siswa:</span>
+                  </div>
+                  <div class="preset-pills">
+                    <button type="button" class="preset-btn" onclick="App.applySubnetPreset('192.168.10.15', 27)">
+                      Lab TKJ &bull; 30 Host (/27)
+                    </button>
+                    <button type="button" class="preset-btn" onclick="App.applySubnetPreset('192.168.20.5', 28)">
+                      Ruang Guru &bull; 14 Host (/28)
+                    </button>
+                    <button type="button" class="preset-btn" onclick="App.applySubnetPreset('10.0.0.1', 30)">
+                      Link Router WAN (/30)
+                    </button>
+                    <button type="button" class="preset-btn" onclick="App.applySubnetPreset('172.16.1.50', 26)">
+                      Lab RPL &bull; 62 Host (/26)
+                    </button>
+                    <button type="button" class="preset-btn" onclick="App.applySubnetPreset('192.168.1.100', 24)">
+                      Gedung Sekolah (/24)
+                    </button>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.6rem; margin-top:1.5rem;">
+                  <button class="btn btn-primary" style="width:100%; display:flex; align-items:center; justify-content:center; gap:0.45rem;" onclick="App.processSubnetCalculation()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span>Hitung &amp; Simulasikan</span>
+                  </button>
+                  <button class="btn btn-secondary" style="width:100%; display:flex; align-items:center; justify-content:center; gap:0.45rem;" onclick="App.openVLSMModal()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Kalkulator VLSM Multi-Segmen</span>
+                  </button>
+                </div>
+
+                <div class="callout callout-info" style="margin-top:1.25rem; font-size:0.78rem;">
+                  <strong>Tip Praktikum SMK:</strong> Prefix <code>/30</code> sangat hemat IP dan digunakan khusus kabel penghubung antar-Router (Point-to-Point)!
+                </div>
+              </div>
+
+              <!-- Output Results Display Card -->
+              <div id="calc-results-mount" class="calc-result-box"></div>
+
+            </div>
+          </div>
+
+          <!-- Mode 2: Network Topology Canvas & Terminal View -->
+          <div id="sim-view-topo" style="display: none;">
+            <div id="topology-sim-mount"></div>
+          </div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 5: Latihan Soal (10 Soal Bertahap)
+             ------------------------------------------------------------------ -->
+        <section id="screen-latihan" class="screen-view">
+          
+          <div class="quiz-header-bar">
+            <div>
+              <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-primary);">
+                Latihan Pemahaman Konsep Subnetting (10 Butir)
+              </h2>
+              <p style="font-size: 0.85rem; color: var(--color-text-muted);">
+                Jawab soal, dapatkan kode warna semantik (Hijau = Benar, Merah = Salah), dan pelajari langkah perhitungannya.
+              </p>
+            </div>
+            <div class="timer-box">
+              <span>⏱️</span>
+              <span id="latihan-timer-display">00:00</span>
+            </div>
+          </div>
+
+          <div class="grid-with-sidebar">
+            
+            <!-- Left: Current Question Box -->
+            <div>
+              <div class="progress-bar-container" style="margin-bottom: 1.25rem;">
+                <div class="progress-header">
+                  <span>Progres Pengerjaan Latihan</span>
+                  <span id="latihan-progress-text">0/10 Soal (0%)</span>
+                </div>
+                <div class="progress-bar-track">
+                  <div id="latihan-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div id="latihan-question-container" class="question-box"></div>
+            </div>
+
+            <!-- Right: Question Number Navigator -->
+            <div class="card" style="padding: 1.5rem;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.5rem;">
+                Navigasi Nomor Soal
+              </h4>
+              <p style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 1rem;">
+                Klik nomor untuk berpindah antar butir soal latihan:
+              </p>
+
+              <div id="latihan-nav-grid" class="question-nav-grid"></div>
+
+              <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-border); font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="width:12px; height:12px; border-radius:3px; background:#16A34A; display:inline-block;"></span>
+                  <span>Jawaban Benar (Hijau)</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="width:12px; height:12px; border-radius:3px; background:#DC2626; display:inline-block;"></span>
+                  <span>Jawaban Salah (Merah)</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span style="width:12px; height:12px; border-radius:3px; background:#2563EB; display:inline-block;"></span>
+                  <span>Sedang Aktif (Biru)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 6: Evaluasi Akhir (20 Soal: 15 PG + 5 Uraian, 30 Min Timer)
+             ------------------------------------------------------------------ -->
+        <section id="screen-evaluasi" class="screen-view">
+          
+          <div class="quiz-header-bar">
+            <div>
+              <span class="badge badge-purple" style="margin-bottom:0.35rem;">UJIAN EVALUASI RESMI</span>
+              <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-primary);">
+                Evaluasi Akhir Pembelajaran Perencanaan & Pengalamatan Jaringan
+              </h2>
+              <p style="font-size: 0.85rem; color: var(--color-text-muted);">
+                20 Butir Soal (15 Pilihan Ganda + 5 Uraian) • Standar Kelulusan KKM: <strong>75 Poin</strong>
+              </p>
+            </div>
+
+            <div id="evaluasi-timer-box" class="timer-box">
+              <span>⏳ Sisa Waktu:</span>
+              <span id="evaluasi-timer-clock">30:00</span>
+            </div>
+          </div>
+
+          <div id="evaluasi-content-area"></div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 7: Hasil Belajar & Tindak Lanjut Terpadu
+             ------------------------------------------------------------------ -->
+        <section id="screen-hasil" class="screen-view">
+          
+          <!-- Banner Profil Siswa & Status Pembelajaran -->
+          <div id="hasil-student-banner" class="hasil-student-banner" style="margin-bottom: 1.5rem;">
+            <!-- Dirender secara dinamis oleh App.renderHasil() -->
+          </div>
+
+          <!-- 4 Kartu Metrik Utama (Materi, Evaluasi, Latihan, & Tingkat Pemahaman) -->
+          <div id="hasil-metrics-grid" class="grid-four-col" style="margin-bottom: 1.75rem;">
+            <!-- Dirender secara dinamis oleh App.renderHasil() -->
+          </div>
+
+          <!-- Adaptive Recommendation Mount (Jalur Pengayaan / Remedial / Panduan Langkah) -->
+          <div id="hasil-adaptive-mount" style="margin-bottom: 2rem;"></div>
+
+          <!-- Keterhubungan 5 Komponen Belajar: Materi, Simulasi, Latihan, Evaluasi, & Refleksi -->
+          <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.25rem; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <h3 class="card-title" style="margin: 0; font-size:1.15rem; color:var(--color-primary); display:flex; align-items:center; gap:0.5rem;">
+                  <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                  <span>Keterhubungan 5 Komponen Belajar</span>
+                </h3>
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">
+                  Hasil evaluasi dan kelulusan dipengaruhi oleh ketuntasan seluruh tahapan belajar berikut:
+                </span>
+              </div>
+              <span class="badge badge-blue" style="font-size:0.75rem;">Terintegrasi Real-Time</span>
+            </div>
+            
+            <div id="hasil-components-grid" class="grid-five-col">
+              <!-- 5 Komponen: Materi, Simulasi, Latihan, Evaluasi, Refleksi -->
+            </div>
+          </div>
+
+          <!-- Competency Mastery & Activity History Grid -->
+          <div class="grid-two-equal" style="gap: 1.5rem; margin-bottom: 2rem;">
+            
+            <!-- Capaian Kompetensi TP1, TP2, TP3 -->
+            <div class="card" style="padding: 1.75rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                <h3 class="card-title" style="margin: 0; font-size:1.15rem; display:flex; align-items:center; gap:0.5rem;">
+                  <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                  <span>Capaian Kompetensi per TP</span>
+                </h3>
+                <span class="badge badge-success" style="font-size: 0.72rem;">Fase F • TJKT</span>
+              </div>
+              <p style="font-size:0.82rem; color:var(--color-text-muted); margin-bottom:1.25rem; line-height:1.5;">
+                Akumulasi capaian hasil belajar dari integrasi pemahaman modul materi, ketepatan latihan soal, dan perolehan poin ujian evaluasi.
+              </p>
+              
+              <div id="hasil-tp-mastery-list">
+                <!-- Dirender secara dinamis oleh App.renderHasil() -->
+              </div>
+
+              <div style="margin-top: 1.5rem; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--color-border); padding-top:1rem; flex-wrap:wrap; gap:0.5rem;">
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">Ambang Kelulusan: <strong>KKM 75 Poin</strong></span>
+                <button id="hasil-cert-btn" class="btn btn-primary" onclick="QuizEngine.openCertificateModal()">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:6px;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Tampilkan Sertifikat
+                </button>
+              </div>
+            </div>
+
+            <!-- Activity History Table -->
+            <div class="card" style="padding: 1.75rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                <h3 class="card-title" style="margin: 0; font-size:1.15rem; display:flex; align-items:center; gap:0.5rem;">
+                  <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Riwayat & Log Aktivitas Belajar</span>
+                </h3>
+                <span class="badge badge-blue" style="font-size: 0.72rem;">Otomatis Tercatat</span>
+              </div>
+              <p style="font-size:0.82rem; color:var(--color-text-muted); margin-bottom:1rem; line-height:1.5;">
+                Rekam jejak komprehensif pengerjaan materi ajar, laboratorium simulasi, latihan soal, evaluasi, dan lembar refleksi mandiri.
+              </p>
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Aktivitas</th>
+                      <th>Waktu</th>
+                      <th>Status / Skor</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hasil-history-tbody">
+                    <!-- Dirender secara dinamis oleh App.renderHasil() -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action Toolbar -->
+          <div id="hasil-action-toolbar" class="card" style="padding: 1.25rem 1.75rem; background: var(--color-bg-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div style="width:38px;height:38px;border-radius:var(--radius-md);background:var(--color-accent-light);display:flex;align-items:center;justify-content:center;color:var(--color-accent);flex-shrink:0;">
+                <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              </div>
+              <div>
+                <strong style="font-size:0.92rem; color:var(--color-primary); display:block;">Transkrip Komprehensif Hasil Belajar NetLearn</strong>
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">SMK Negeri 3 Makassar • Perencanaan & Pengalamatan Jaringan (CIDR, Subnetting, VLSM)</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.75rem;">
+              <button class="btn btn-secondary btn-sm" onclick="App.printHasilReport()">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Cetak Transkrip Nilai
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="App.renderHasil(); showToast('Data hasil belajar disinkronkan kembali!', 'info');">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>Segarkan Data
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ------------------------------------------------------------------
+             SCREEN 8: Refleksi Pembelajaran Mandiri
+             ------------------------------------------------------------------ -->
+        <section id="screen-refleksi" class="screen-view">
+          
+          <div class="grid-with-sidebar">
+            
+            <!-- Left: Reflection Questions Form -->
+            <div>
+              <div class="card" style="padding: 2rem; margin-bottom: 1.5rem;">
+                <div style="margin-bottom: 1.5rem;">
+                  <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-primary);">
+                    Lembar Refleksi Pembelajaran Mandiri
+                  </h2>
+                  <p style="font-size: 0.88rem; color: var(--color-text-muted);">
+                    Tuliskan evaluasi mandiri Anda terhadap materi perencanaan dan pengalamatan jaringan yang telah dipelajari. Maksimal 300 karakter per pertanyaan.
+                  </p>
+                </div>
+
+                <!-- Prompt 1 -->
+                <div class="reflection-prompt-card">
+                  <label class="form-label" style="font-size: 0.95rem;">
+                    1. Apa saja konsep pengalamatan jaringan yang sudah Anda pahami dengan baik?
+                  </label>
+                  <textarea id="ref-q1" class="form-control" maxlength="300" 
+                            placeholder="Contoh: Saya sudah paham rumus 2^y-2 untuk menentukan host, fungsi default mask kelas C, dan cara konversi biner ke desimal..."
+                            oninput="App.updateCharCount('ref-q1', 300)"></textarea>
+                  <div id="ref-q1-counter" class="char-counter">0/300 karakter</div>
+                </div>
+
+                <!-- Prompt 2 -->
+                <div class="reflection-prompt-card">
+                  <label class="form-label" style="font-size: 0.95rem;">
+                    2. Bagian materi apa yang menurut Anda masih sulit atau membingungkan?
+                  </label>
+                  <textarea id="ref-q2" class="form-control" maxlength="300" 
+                            placeholder="Contoh: Masih butuh latihan lebih banyak saat mengalokasikan VLSM jika host-nya membutuhkan prefix yang berbeda pada kelas B..."
+                            oninput="App.updateCharCount('ref-q2', 300)"></textarea>
+                  <div id="ref-q2-counter" class="char-counter">0/300 karakter</div>
+                </div>
+
+                <!-- Prompt 3 -->
+                <div class="reflection-prompt-card">
+                  <label class="form-label" style="font-size: 0.95rem;">
+                    3. Apa rencana atau langkah yang akan Anda lakukan untuk memperdalam materi selanjutnya?
+                  </label>
+                  <textarea id="ref-q3" class="form-control" maxlength="300" 
+                            placeholder="Contoh: Saya akan mencoba merakit topologi skenario 3 di simulator dan melakukan simulasi ping antar subnet..."
+                            oninput="App.updateCharCount('ref-q3', 300)"></textarea>
+                  <div id="ref-q3-counter" class="char-counter">0/300 karakter</div>
+                </div>
+
+                <!-- Actions -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem;">
+                  <button class="btn btn-secondary" onclick="App.resetRefleksiForm()">
+                    <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Bersihkan Formulir
+                  </button>
+                  <button class="btn btn-primary btn-lg" onclick="App.saveRefleksi()">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Simpan Refleksi Belajar
+                  </button>
+                </div>
+              </div>
+
+              <!-- History Feed -->
+              <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;">
+                Riwayat Refleksi Belajar Sebelumnya
+              </h3>
+              <div id="refleksi-history-mount" class="reflection-history-list"></div>
+            </div>
+
+            <!-- Right: Circular Indicator & Tips -->
+            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+              
+              <div class="card" style="padding: 1.5rem; text-align: center;">
+                <h4 style="font-size:0.95rem; font-weight:700; margin-bottom:1rem;">Target Pertemuan Lab</h4>
+                <div style="display:flex; justify-content:center; margin-bottom:1rem;">
+                  <div class="circular-progress">
+                    <svg viewBox="0 0 80 80">
+                      <circle class="circle-bg" cx="40" cy="40" r="35"></circle>
+                      <circle class="circle-progress-bar" cx="40" cy="40" r="35" style="stroke-dashoffset: 88;"></circle>
+                    </svg>
+                    <div class="circle-text">3/5</div>
+                  </div>
+                </div>
+                <p style="font-size:0.8rem; color:var(--color-text-muted);">
+                  Refleksi Anda akan dibaca oleh Guru untuk merancang bimbingan di laboratorium pekan depan.
+                </p>
+              </div>
+
+              <div class="card" style="padding: 1.5rem;">
+                <h4 style="font-size:0.92rem; font-weight:700; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.4rem;">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                  <span>Manfaat Refleksi Mandiri</span>
+                </h4>
+                <p style="font-size:0.82rem; color:var(--color-text-main); line-height:1.6;">
+                  Refleksi membantu melatih kemampuan <em>metakognisi</em> siswa SMK agar mampu mengenali kelemahan perhitungan secara dini sebelum menghadapi ujian sertifikasi kejuruan.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==================================================================
+             GURU / ADMIN PANELS (Exclusive for Teacher Role)
+             ================================================================== -->
+        
+        <section id="screen-guru-dashboard" class="screen-view">
+          <div class="card" style="background: linear-gradient(140deg, #131929, #0D1425); color:#FFF; padding:2rem; margin-bottom:1.75rem; border-radius:var(--radius-xl);">
+            <span class="badge badge-purple" style="margin-bottom:0.5rem;">PANEL KONTROL GURU</span>
+            <h2 style="color:#FFF; font-size:1.65rem; margin-bottom:0.35rem; letter-spacing:-0.02em;">
+              Dashboard Pengelolaan & Pemantauan Kelas
+            </h2>
+            <p style="color:rgba(255,255,255,0.6); font-size:0.93rem;">
+              Mata Pelajaran: Perencanaan & Pengalamatan Jaringan — Kelas XI TKJ 1 SMK Negeri 3 Makassar
+            </p>
+          </div>
+
+          <div class="grid-four-col" style="margin-bottom:2rem;">
+            <div class="card" style="padding:1.25rem;">
+              <span class="metric-label">Total Siswa Terdaftar</span>
+              <div id="guru-stat-total" class="metric-val" style="font-size:1.75rem;">7</div>
+              <span class="metric-bin">Kelas XI TKJ 1</span>
+            </div>
+            <div class="card" style="padding:1.25rem;">
+              <span class="metric-label">Rata-Rata Nilai Evaluasi</span>
+              <div id="guru-stat-avg" class="metric-val" style="color:#2563EB; font-size:1.75rem;">80 / 100</div>
+              <span class="metric-bin">Di atas KKM 75</span>
+            </div>
+            <div class="card" style="padding:1.25rem;">
+              <span class="metric-label">Siswa Tuntas KKM</span>
+              <div id="guru-stat-passed" class="metric-val" style="color:#16A34A; font-size:1.75rem;">5 Siswa</div>
+              <span class="metric-bin">Jalur Pengayaan</span>
+            </div>
+            <div class="card" style="padding:1.25rem;">
+              <span class="metric-label">Siswa Butuh Remedial</span>
+              <div id="guru-stat-remedial" class="metric-val" style="color:#DC2626; font-size:1.75rem;">2 Siswa</div>
+              <span class="metric-bin">Perlu Bimbingan Tambahan</span>
+            </div>
+          </div>
+
+          <div class="card" style="padding:1.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+              <h3 class="card-title">Aktivitas Siswa Terkini</h3>
+              <button class="btn btn-secondary btn-sm" onclick="App.navigateTo('guru-laporan')">Lihat Semua Siswa →</button>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Nama Siswa</th>
+                    <th>NIS</th>
+                    <th>Kelas</th>
+                    <th>Nilai Latihan</th>
+                    <th>Nilai Evaluasi</th>
+                    <th>Status Kelulusan</th>
+                  </tr>
+                </thead>
+                <tbody id="guru-recent-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Guru Screen 2: CMS Kelola Materi -->
+        <section id="screen-guru-cms-materi" class="screen-view">
+          <div class="card" style="background: linear-gradient(135deg, #131929, #0D1425); color:#FFF; padding:1.75rem 2rem; margin-bottom:1.5rem; border-radius:var(--radius-xl);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <span class="badge badge-purple" style="margin-bottom:0.4rem;">PUSAT KONTROL MATERI GURU</span>
+                <h2 style="color:#FFF; font-size:1.5rem; margin-bottom:0.35rem; font-weight:800;">
+                  Pengelolaan Modul Materi Pembelajaran
+                </h2>
+                <p style="color:#CBD5E1; font-size:0.9rem; max-width:680px; line-height:1.5;">
+                  Unggah dan sesuaikan <strong>Slide PPT Presentasi</strong>, <strong>Dokumen Penjelasan Rinci (Word)</strong>, dan <strong>Link Video YouTube</strong>. Semua pembaruan materi yang Anda simpan langsung terhubung dan tampil secara real-time di layar siswa.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="App.openCreateCMSModal()" style="display:inline-flex; align-items:center; gap:0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Tambah Modul Baru</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="App.loadSampleMateriFromCMS()" title="Muat contoh materi lengkap pengalamatan jaringan">
+                  Muat Contoh Materi
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="App.clearAllMateriFromCMS()" style="color:var(--color-danger);" title="Kosongkan semua materi untuk pengujian">
+                  Kosongkan Materi
+                </button>
+                <button class="btn btn-outline-primary btn-sm" onclick="App.switchRole('siswa'); App.navigateTo('materi');">
+                  Lihat di Layar Siswa
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="guru-cms-modules-list"></div>
+        </section>
+
+        <!-- Guru Screen 3: Kelola Bank Soal -->
+        <section id="screen-guru-bank-soal" class="screen-view">
+          <div class="card" style="padding:1.75rem; margin-bottom:1.5rem; background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%); color:#FFF;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <span class="badge badge-purple" style="margin-bottom:0.4rem;">BANK SOAL & INSTRUMEN UJIAN</span>
+                <h2 style="font-size:1.45rem; font-weight:800; color:#FFF; margin-bottom:0.35rem;">
+                  Manajemen Bank Soal Latihan & Evaluasi
+                </h2>
+                <p style="font-size:0.88rem; color:#CBD5E1; max-width:680px; line-height:1.5;">
+                  Kelola dan sesuaikan butir soal interaktif pilihan ganda, kunci jawaban, dan uraian analisis yang terhubung langsung ke latihan bertahap serta ujian semester siswa.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="App.openAddQuestionModal()" style="display:inline-flex; align-items:center; gap:0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Tambah Butir Soal</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="App.resetBankSoalConfirm()" title="Kembalikan semua butir soal ke standar kurikulum bawaan">
+                  Reset ke Standar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bank Soal Type Switcher Tabs -->
+          <div class="db-tab-bar" style="margin-bottom:1.25rem;">
+            <button id="btn-bank-tab-latihan" class="db-tab-btn active" onclick="App.switchBankSoalTab('latihan')">
+              Soal Latihan (<span id="count-bank-latihan">10</span>)
+            </button>
+            <button id="btn-bank-tab-eval-pg" class="db-tab-btn" onclick="App.switchBankSoalTab('eval_pg')">
+              Pilihan Ganda Evaluasi (<span id="count-bank-eval-pg">15</span>)
+            </button>
+            <button id="btn-bank-tab-eval-ur" class="db-tab-btn" onclick="App.switchBankSoalTab('eval_ur')">
+              Uraian Analisis (<span id="count-bank-eval-ur">5</span>)
+            </button>
+          </div>
+
+          <div id="guru-bank-soal-list"></div>
+        </section>
+
+        <!-- Guru Screen 4: Laporan Hasil Belajar Kelas & Database Siswa -->
+        <section id="screen-guru-laporan" class="screen-view">
+          <div class="card" style="padding:1.75rem;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <h3 class="card-title" style="margin-bottom:0.25rem;">Rekapitulasi Capaian Seluruh Siswa</h3>
+                <p style="font-size:0.85rem; color:var(--color-text-muted);">Tabel penilaian otomatis nilai latihan, ujian evaluasi akhir, dan status kelulusan KKM 75.</p>
+              </div>
+              <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="App.openAddStudentModal()" style="display:inline-flex; align-items:center; gap:0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Tambah Siswa Baru</span>
+                </button>
+                <button class="btn btn-success" onclick="App.exportClassReportCSV()" style="display:inline-flex; align-items:center; gap:0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  <span>Ekspor CSV / Excel</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Toolbar Pencarian & Filter Kelas -->
+            <div class="search-filter-bar">
+              <div style="flex:1; min-width:220px;">
+                <input type="text" id="guru-laporan-search" class="form-control form-control-sm" placeholder="Cari nama siswa atau NIS..." oninput="App.renderGuruLaporan()">
+              </div>
+              <div style="min-width:140px;">
+                <select id="guru-laporan-filter-kelas" class="form-control form-control-sm" onchange="App.renderGuruLaporan()">
+                  <option value="all">Semua Kelas</option>
+                  <option value="XI TKJ 1">XI TKJ 1</option>
+                  <option value="XI TKJ 2">XI TKJ 2</option>
+                  <option value="XI TKJ 3">XI TKJ 3</option>
+                </select>
+              </div>
+              <div style="min-width:140px;">
+                <select id="guru-laporan-filter-status" class="form-control form-control-sm" onchange="App.renderGuruLaporan()">
+                  <option value="all">Semua Status</option>
+                  <option value="Tuntas">Tuntas KKM</option>
+                  <option value="Remedial">Remedial</option>
+                  <option value="Belum Ujian">Belum Ujian</option>
+                </select>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('guru-laporan-search').value=''; document.getElementById('guru-laporan-filter-kelas').value='all'; document.getElementById('guru-laporan-filter-status').value='all'; App.renderGuruLaporan();" title="Reset filter">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:4px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Reset Filter
+              </button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Nama Lengkap Siswa</th>
+                    <th>NIS</th>
+                    <th>Kelas</th>
+                    <th>Skor Latihan</th>
+                    <th>Skor Evaluasi (KKM 75)</th>
+                    <th>Status Kelulusan</th>
+                    <th>Tanggal</th>
+                    <th style="text-align:center;">Aksi Database</th>
+                  </tr>
+                </thead>
+                <tbody id="guru-laporan-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Guru Screen 5: Rekap Refleksi Siswa -->
+        <section id="screen-guru-refleksi" class="screen-view">
+          <div class="card" style="padding:1.75rem;">
+            <h3 class="card-title" style="margin-bottom:0.25rem;">Rekapitulasi Umpan Balik Refleksi Belajar Siswa</h3>
+            <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:1.25rem;">
+              Gunakan catatan kendala belajar siswa ini sebagai bahan evaluasi tatap muka di laboratorium komputer sekolah.
+            </p>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Nama Siswa</th>
+                    <th>Materi yang Dipahami</th>
+                    <th>Kendala yang Masih Sulit</th>
+                    <th>Rencana Langkah Selanjutnya</th>
+                    <th style="text-align:center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="guru-refleksi-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Guru Screen 6: Pusat Manajemen Database & Cadangan Data (Full Database Control Center) -->
+        <section id="screen-guru-database" class="screen-view">
+          
+          <!-- Hero Header Card -->
+          <div class="card" style="padding:1.85rem 2rem; margin-bottom:1.5rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); color:#FFF;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1.25rem;">
+              <div>
+                <span class="badge badge-blue" style="margin-bottom:0.5rem;">PUSAT KONTROL DATABASE NETLEARN</span>
+                <h2 style="font-size:1.55rem; font-weight:800; color:#FFF; margin-bottom:0.35rem;">
+                  Database Siswa, Modul, Bank Soal, & Manajemen Cadangan
+                </h2>
+                <p style="font-size:0.9rem; color:#94A3B8; max-width:720px; line-height:1.6;">
+                  Pusat pengelolaan terpusat seluruh tabel basis data NetLearn: tabel siswa, modul kurikulum, butir soal, refleksi, dan akun instruktur. Dilengkapi fasilitas <strong>Ekspor Cadangan (.JSON)</strong> dan <strong>Pemulihan Data (Restore)</strong> instan.
+                </p>
+              </div>
+              <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                <button class="btn btn-success" onclick="App.exportDatabaseBackup()" title="Unduh seluruh database ke file JSON" style="display:inline-flex; align-items:center; gap:0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                  <span>Unduh Cadangan (.json)</span>
+                </button>
+                <button class="btn btn-secondary" onclick="App.triggerDatabaseImportFile()" title="Pulihkan database dari file cadangan JSON" style="display:inline-flex; align-items:center; gap:0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="16 16 12 12 8 16"></polyline></svg>
+                  <span>Pulihkan Cadangan</span>
+                </button>
+                <input type="file" id="db-file-input" accept=".json" style="display:none;" onchange="App.handleDatabaseFileSelected(event)">
+                <button class="btn btn-primary btn-sm" onclick="App.seedFullDatabaseDemo()" title="Muat paket data demo standar lengkap">
+                  Muat Data Uji Coba SMK 3
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5 Stat Metrics Cards Database -->
+          <div class="grid-five-col" style="margin-bottom:1.75rem;">
+            <div class="card" style="padding:1.15rem;">
+              <span style="font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted);">
+                Database Siswa
+              </span>
+              <div id="db-stat-students" style="font-size:1.8rem; font-weight:800; color:var(--color-primary); margin-top:0.2rem;">0</div>
+              <span style="font-size:0.74rem; color:var(--color-text-muted);">Peserta Didik Terdaftar</span>
+            </div>
+
+            <div class="card" style="padding:1.15rem;">
+              <span style="font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted);">
+                Database Modul
+              </span>
+              <div id="db-stat-modules" style="font-size:1.8rem; font-weight:800; color:var(--color-accent); margin-top:0.2rem;">0</div>
+              <span style="font-size:0.74rem; color:var(--color-text-muted);">Bahan Ajar PPT / Word</span>
+            </div>
+
+            <div class="card" style="padding:1.15rem;">
+              <span style="font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted);">
+                Bank Soal
+              </span>
+              <div id="db-stat-questions" style="font-size:1.8rem; font-weight:800; color:var(--color-interactive); margin-top:0.2rem;">0</div>
+              <span style="font-size:0.74rem; color:var(--color-text-muted);">Butir Soal Latihan & Ujian</span>
+            </div>
+
+            <div class="card" style="padding:1.15rem;">
+              <span style="font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted);">
+                Refleksi Siswa
+              </span>
+              <div id="db-stat-reflections" style="font-size:1.8rem; font-weight:800; color:#10B981; margin-top:0.2rem;">0</div>
+              <span style="font-size:0.74rem; color:var(--color-text-muted);">Catatan Refleksi Mandiri</span>
+            </div>
+
+            <div class="card" style="padding:1.15rem;">
+              <span style="font-size:0.72rem; font-weight:700; text-transform:uppercase; color:var(--color-text-muted);">
+                Ukuran Penyimpanan
+              </span>
+              <div id="db-stat-storage" style="font-size:1.8rem; font-weight:800; color:#8B5CF6; margin-top:0.2rem;">0 KB</div>
+              <span style="font-size:0.74rem; color:var(--color-text-muted);">Penyimpanan Lokal Browser</span>
+            </div>
+          </div>
+
+          <!-- Explorer Tab Bar -->
+          <div class="card" style="padding:1.5rem;">
+            <div class="db-tab-bar">
+              <button id="btn-db-tab-siswa" class="db-tab-btn active" onclick="App.switchDatabaseTab('siswa')">
+                Database Siswa
+              </button>
+              <button id="btn-db-tab-modul" class="db-tab-btn" onclick="App.switchDatabaseTab('modul')">
+                Database Modul &amp; Materi
+              </button>
+              <button id="btn-db-tab-soal" class="db-tab-btn" onclick="App.switchDatabaseTab('soal')">
+                Database Bank Soal
+              </button>
+              <button id="btn-db-tab-guru" class="db-tab-btn" onclick="App.switchDatabaseTab('guru')">
+                Database Akun Guru
+              </button>
+            </div>
+
+            <!-- Tab Content Mount -->
+            <div id="guru-db-tab-content">
+              <!-- Mounted by App.renderGuruDatabaseTab() -->
+            </div>
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ======================================================================
+       Global Modal Dialog
+       ====================================================================== -->
+  <div id="global-modal" class="modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title">Judul Dialog</h3>
+        <button class="modal-close-btn" onclick="closeModal()" title="Tutup Dialog">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/subnet-calc.js"></script>
+  <script src="js/topology-sim.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Initialize application when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
+  </script>
+</body>
+</html>
