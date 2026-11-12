@@ -542,6 +542,7 @@ const App = {
     const ytVideoId = !isNativeVideo ? this.extractYoutubeId(cur.videoUrl) : '';
     const ytEmbedUrl = !isNativeVideo ? this.getYoutubeEmbedUrl(cur.videoUrl) : '';
     const ytWatchUrl = !isNativeVideo ? this.getYoutubeWatchUrl(cur.videoUrl) : '';
+    const isFileProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:');
 
     // Hitung Progress
     const doneCount = NetLearnStore.state.materiProgress.filter(Boolean).length;
@@ -695,9 +696,20 @@ const App = {
                       <video src="${cur.videoUrl}" controls playsinline autoplay controlsList="nodownload" style="width:100%; height:100%; max-height:560px; object-fit:contain;"></video>
                     </div>
                   ` : `
+                    ${isFileProtocol ? `
+                      <div style="background:#FFFBEB; border-bottom:1px solid #FDE68A; padding:0.6rem 1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                          <span>⚠️</span>
+                          <span><strong>Protokol Lokal (file:///):</strong> Jika muncul <em>Error 153</em> dari kebijakan YouTube, jalankan via <strong>Jalankan_NetLearn.bat</strong> atau klik tombol merah di samping. Di server web / hosting Vercel, video otomatis berputar langsung.</span>
+                        </div>
+                        <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-sm" style="background:#DC2626; color:#FFF; font-weight:700; border-radius:6px; font-size:0.75rem; text-decoration:none; padding:0.3rem 0.75rem;">
+                          ▶ Buka Video di YouTube ↗
+                        </a>
+                      </div>
+                    ` : ''}
                     <iframe id="materi-video-main-iframe" 
                             class="materi-ppt-iframe" 
-                            src="${ytEmbedUrl}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" 
+                            src="${ytEmbedUrl}" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             referrerpolicy="strict-origin-when-cross-origin"
                             allowfullscreen 
@@ -849,6 +861,17 @@ const App = {
                   </div>
                 ` : (
                   ytEmbedUrl ? `
+                    ${isFileProtocol ? `
+                      <div style="background:#FFFBEB; border-bottom:1px solid #FDE68A; padding:0.6rem 1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap;">
+                        <div style="display:flex; align-items:center; gap:0.4rem;">
+                          <span>⚠️</span>
+                          <span><strong>Protokol Lokal (file:///):</strong> Jika muncul <em>Error 153</em> dari YouTube, klik tombol di samping atau jalankan melalui <strong>Jalankan_NetLearn.bat</strong>. Di hosting live Vercel video berputar normal 100%.</span>
+                        </div>
+                        <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-sm" style="background:#DC2626; color:#FFF; font-weight:700; border-radius:6px; font-size:0.75rem; text-decoration:none; padding:0.3rem 0.75rem;">
+                          ▶ Buka Video di YouTube ↗
+                        </a>
+                      </div>
+                    ` : ''}
                     <iframe src="${ytEmbedUrl}" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                             referrerpolicy="strict-origin-when-cross-origin"
@@ -1061,7 +1084,7 @@ const App = {
     const videoId = this.extractYoutubeId(url);
     if (videoId) {
       const ap = autoplay ? '&autoplay=1' : '';
-      return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1${ap}`;
+      return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1${ap}`;
     }
     const trimmed = url.trim();
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
