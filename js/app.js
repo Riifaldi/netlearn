@@ -525,6 +525,8 @@ const App = {
     const embedPPTUrl = hasEmbedPPT ? this.getSlidesEmbedUrl(cur.pptUrl) : '';
 
     // Video YouTube State
+    const hasVideo = Boolean(cur.videoUrl && cur.videoUrl.trim());
+    const ytVideoId = this.extractYoutubeId(cur.videoUrl);
     const ytEmbedUrl = this.getYoutubeEmbedUrl(cur.videoUrl);
     const ytWatchUrl = this.getYoutubeWatchUrl(cur.videoUrl);
 
@@ -559,12 +561,16 @@ const App = {
             ${modules.map((m, idx) => {
       const isActive = (idx === modIdx);
       const isDone = NetLearnStore.state.materiProgress[idx];
+      const hasModYT = Boolean(m.videoUrl && m.videoUrl.trim());
       return `
                 <li>
                   <button class="materi-nav-btn ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}"
                           onclick="App.openModule(${idx})">
                     <span class="num-badge">${isDone ? '✓' : idx + 1}</span>
-                    <span class="mod-title-text">${m.title}</span>
+                    <span class="mod-title-text" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                      <span>${m.title}</span>
+                      ${hasModYT ? '<span title="Video YouTube Tersemat" style="font-size:0.75rem; color:#DC2626; margin-left:4px;">🎥</span>' : ''}
+                    </span>
                   </button>
                 </li>
               `;
@@ -600,6 +606,31 @@ const App = {
             </div>
             <h2 class="materi-main-title">${cur.title}</h2>
             <p class="materi-main-subtitle">${cur.subtitle || 'Simak slide presentasi utama di bawah ini dan buka penjelasan lebih rinci untuk uraian dokumen lengkap.'}</p>
+
+            <!-- Quick Media Navigation Bar -->
+            <div class="materi-media-nav-bar" style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:0.85rem; border-top:1px solid var(--color-border);">
+              <button class="btn btn-secondary btn-sm" onclick="App.scrollToMateriElement('materi-ppt-wrapper-el')" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>Slide Presentasi (${slides.length > 0 ? `${slides.length} Slide` : 'PPT'})</span>
+              </button>
+              
+              <button class="btn btn-secondary btn-sm" onclick="App.scrollToMateriElement('word-detail-banner-el')" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <span>Dokumen Rinci (Word)</span>
+              </button>
+
+              ${hasVideo ? `
+                <button class="btn btn-primary btn-sm" onclick="App.scrollToMateriElement('materi-video-section-el')" style="display:inline-flex; align-items:center; gap:0.35rem; background:#DC2626; border-color:#DC2626;">
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                  <span>Video Tutorial YouTube (Tersedia) 🎥</span>
+                </button>
+              ` : `
+                <span style="font-size:0.75rem; color:var(--color-text-muted); display:inline-flex; align-items:center; gap:0.3rem;">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                  <span>Video: Belum Ditambahkan</span>
+                </span>
+              `}
+            </div>
           </div>
 
           <!-- ============================================================
@@ -694,7 +725,7 @@ const App = {
           <!-- ============================================================
                BANNER & TOMBOL PENJELASAN LEBIH RINCI (DOKUMEN WORD)
                ============================================================ -->
-          <section class="word-detail-banner">
+          <section class="word-detail-banner" id="word-detail-banner-el">
             <div class="word-banner-info">
               <div class="word-doc-icon-wrap">
                 <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--color-primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -725,36 +756,78 @@ const App = {
           </section>
 
           <!-- ============================================================
-               KARTU VIDEO TUTORIAL YOUTUBE
+               KARTU VIDEO TUTORIAL YOUTUBE (SELALU AKTIF BILA ADA TAUTAN VIDEO)
                ============================================================ -->
-          ${ytEmbedUrl ? `
-            <section class="materi-video-section">
+          ${hasVideo ? `
+            <section class="materi-video-section" id="materi-video-section-el">
               <div class="video-section-header">
                 <div class="video-title-wrap">
                   <span class="video-yt-badge">YOUTUBE</span>
                   <span>${cur.videoTitle || 'Video Tutorial Pembahasan Materi'}</span>
                 </div>
                 ${ytWatchUrl ? `
-                  <a href="${ytWatchUrl}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
-                    ▶ Tonton di YouTube ↗
+                  <a href="${ytWatchUrl}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                    <span>▶ Tonton di YouTube</span>
+                    <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                 ` : ''}
               </div>
 
               <div class="materi-video-player-wrap">
-                <iframe src="${ytEmbedUrl}" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen 
-                        title="Video Tutorial YouTube">
-                </iframe>
+                ${ytEmbedUrl ? `
+                  <iframe src="${ytEmbedUrl}" 
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                          referrerpolicy="strict-origin-when-cross-origin"
+                          allowfullscreen 
+                          title="${cur.videoTitle || 'Video Tutorial YouTube'}">
+                  </iframe>
+                ` : `
+                  <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; color:#FFF; background:#0F172A;">
+                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎥</div>
+                    <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.5rem;">${cur.videoTitle || 'Video Tutorial Modul'}</h4>
+                    <p style="color:#94A3B8; max-width:480px; font-size:0.85rem; margin-bottom:1.25rem;">
+                      Tautan video terlampir: <code>${cur.videoUrl}</code>
+                    </p>
+                    <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; display:inline-flex; align-items:center; gap:0.4rem;">
+                      <span>▶ Putar Video di YouTube Tab Baru</span>
+                      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+                  </div>
+                `}
               </div>
 
               <div class="video-section-footer">
-                <span>Simak penjelasan guru melalui video di atas untuk memperkuat konsep visual.</span>
-                <span>Resolusi HD Tersedia</span>
+                <span style="display:flex; align-items:center; gap:0.35rem;">
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Simak penjelasan guru melalui video di atas untuk memperkuat pemahaman konsep visual.</span>
+                </span>
+                <span style="font-size:0.75rem; color:var(--color-text-muted);">
+                  Tautan Video: <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" style="color:var(--color-accent); text-decoration:underline;">Buka Langsung ↗</a>
+                </span>
               </div>
             </section>
-          ` : ''}
+          ` : `
+            <!-- Keadaan Jika Belum Ada Video -->
+            <section class="materi-video-section" id="materi-video-section-el" style="background:#F8FAFC; border-style:dashed;">
+              <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+                <div style="display:flex; align-items:center; gap:0.6rem;">
+                  <div style="width:36px; height:36px; border-radius:50%; background:#E2E8F0; display:flex; align-items:center; justify-content:center; color:#64748B;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                  </div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.92rem; color:var(--color-text);">Video Tutorial Belum Ditambahkan</div>
+                    <div style="font-size:0.78rem; color:var(--color-text-muted);">Guru pengampu dapat melampirkan video YouTube penjelasan melalui Panel CMS.</div>
+                  </div>
+                </div>
+                ${isGuru ? `
+                  <button class="btn btn-secondary btn-sm" onclick="App.openEditCMSModal(${modIdx})" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                    <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>+ Tambah Link Video YouTube di CMS</span>
+                  </button>
+                ` : ''}
+              </div>
+            </section>
+          `}
 
           <!-- Poin Kunci Tambahan jika ada -->
           ${(cur.keyPoints && cur.keyPoints.length > 0) ? `
@@ -860,53 +933,126 @@ const App = {
     }
   },
 
-  // Helper Pengubah Tautan YouTube Menjadi Format Embed Resmi
-  getYoutubeEmbedUrl(url) {
+  // Ekstraktor ID Video YouTube Super Tangguh (Mendukung 16+ format tautan, live, shorts & snippet iframe)
+  extractYoutubeId(url) {
     if (!url || typeof url !== 'string') return '';
-    const trimmed = url.trim();
-    if (!trimmed) return '';
+    let str = url.trim();
+    if (!str) return '';
 
-    // Sudah format embed
-    if (trimmed.includes('youtube.com/embed/') || trimmed.includes('youtube-nocookie.com/embed/')) {
-      return trimmed;
-    }
-
-    let videoId = '';
-    // Format youtube.com/watch?v=ID
-    const vMatch = trimmed.match(/[?&]v=([a-zA-Z0-9_-]+)/);
-    if (vMatch && vMatch[1]) {
-      videoId = vMatch[1];
-    } else {
-      // Format youtu.be/ID
-      const beMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
-      if (beMatch && beMatch[1]) {
-        videoId = beMatch[1];
-      } else if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) {
-        videoId = trimmed;
+    // 1. Jika pengguna menempelkan kode sematan <iframe> penuh (<iframe src="https://www.youtube.com/embed/..." ...>)
+    if (str.includes('<iframe') || str.includes('src=')) {
+      const srcMatch = str.match(/src=["']([^"']+)["']/i);
+      if (srcMatch && srcMatch[1]) {
+        str = srcMatch[1].trim();
       }
     }
 
-    if (videoId) {
-      return `https://www.youtube-nocookie.com/embed/${videoId}`;
+    // 2. Jika sudah merupakan ID video 11 karakter murni
+    if (/^[a-zA-Z0-9_-]{11}$/.test(str)) {
+      return str;
     }
-    return trimmed;
+
+    // 3. Format youtube.com/embed/ID atau youtube-nocookie.com/embed/ID
+    const embedMatch = str.match(/(?:youtube\.com|youtube-nocookie\.com)\/embed\/([a-zA-Z0-9_-]{11})/i);
+    if (embedMatch && embedMatch[1]) return embedMatch[1];
+
+    // 4. Format youtube.com/watch?v=ID atau parameter v= di mana saja
+    const watchMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/i);
+    if (watchMatch && watchMatch[1]) return watchMatch[1];
+
+    // 5. Format youtu.be/ID (termasuk ?si=... dan parameter tracking)
+    const beMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/i);
+    if (beMatch && beMatch[1]) return beMatch[1];
+
+    // 6. Format YouTube Shorts: youtube.com/shorts/ID
+    const shortsMatch = str.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/i);
+    if (shortsMatch && shortsMatch[1]) return shortsMatch[1];
+
+    // 7. Format YouTube Live: youtube.com/live/ID
+    const liveMatch = str.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/i);
+    if (liveMatch && liveMatch[1]) return liveMatch[1];
+
+    // 8. Fallback umum pola ID 11 karakter
+    const generalMatch = str.match(/(?:[=/]|^)([a-zA-Z0-9_-]{11})(?:[?&/#]|$)/);
+    if (generalMatch && generalMatch[1]) return generalMatch[1];
+
+    return '';
+  },
+
+  // Helper Pengubah Tautan YouTube Menjadi Format Embed Resmi (Universally Supported)
+  getYoutubeEmbedUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    const videoId = this.extractYoutubeId(url);
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}?rel=0`;
+    }
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    return '';
   },
 
   getYoutubeWatchUrl(url) {
     if (!url || typeof url !== 'string') return '';
-    const trimmed = url.trim();
-    if (!trimmed) return '';
+    const videoId = this.extractYoutubeId(url);
+    if (videoId) {
+      return `https://www.youtube.com/watch?v=${videoId}`;
+    }
+    return url.trim();
+  },
 
-    if (trimmed.includes('youtube.com/watch')) return trimmed;
-    const embedMatch = trimmed.match(/embed\/([a-zA-Z0-9_-]+)/);
-    if (embedMatch && embedMatch[1]) {
-      return `https://www.youtube.com/watch?v=${embedMatch[1]}`;
+  // Pratinjau Tautan Video YouTube Secara Real-Time pada Modal CMS
+  previewCMSVideoUrl() {
+    const input = document.getElementById('cms-form-yt');
+    const previewEl = document.getElementById('cms-yt-preview');
+    if (!input || !previewEl) return;
+
+    const val = input.value.trim();
+    if (!val) {
+      previewEl.innerHTML = '';
+      return;
     }
-    const beMatch = trimmed.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
-    if (beMatch && beMatch[1]) {
-      return `https://www.youtube.com/watch?v=${beMatch[1]}`;
+
+    const videoId = this.extractYoutubeId(val);
+    if (videoId) {
+      previewEl.innerHTML = `
+        <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:var(--radius-md); padding:0.6rem 0.85rem; font-size:0.78rem; color:#065F46; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap; margin-top:0.4rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <span>✅</span>
+            <strong>Link YouTube Terdeteksi Valid!</strong>
+            <span style="font-family:var(--font-mono); font-size:0.72rem; color:#047857;">(ID: ${videoId})</span>
+          </div>
+          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" rel="noopener" style="color:#047857; text-decoration:underline; font-weight:600;">
+            Buka Video di Tab Baru ↗
+          </a>
+        </div>
+      `;
+    } else {
+      previewEl.innerHTML = `
+        <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:var(--radius-md); padding:0.6rem 0.85rem; font-size:0.78rem; color:#92400E; margin-top:0.4rem;">
+          ⚠️ Format link YouTube belum dikenali. Contoh link yang didukung:
+          <br><code>https://www.youtube.com/watch?v=BWZ-MHIhqjA</code> atau <code>https://youtu.be/BWZ-MHIhqjA</code>
+        </div>
+      `;
     }
-    return trimmed;
+  },
+
+  // Helper Smooth Scroll ke Elemen Spesifik pada Layar Materi
+  scrollToMateriElement(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const origBorder = el.style.borderColor;
+      const origShadow = el.style.boxShadow;
+      el.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+      el.style.borderColor = 'var(--color-accent)';
+      el.style.boxShadow = '0 0 0 4px rgba(79, 110, 247, 0.35)';
+      setTimeout(() => {
+        el.style.boxShadow = origShadow;
+        el.style.borderColor = origBorder;
+      }, 2000);
+    }
   },
 
   // Helper Pengubah Tautan Google Slides Menjadi Format Embed
@@ -1143,8 +1289,8 @@ const App = {
                   <button class="btn btn-primary btn-sm" onclick="App.openEditCMSModal(${idx})">
                     Sunting
                   </button>
-                  <button class="btn btn-secondary btn-sm" onclick="App.openModule(${idx}); App.switchRole('siswa'); App.navigateTo('materi');">
-                    Pratinjau
+                  <button class="btn btn-secondary btn-sm" onclick="App.openModule(${idx}); App.navigateTo('materi');" title="Buka dan Pratinjau Modul Ini Langsung di Layar Materi">
+                    Lihat di Materi
                   </button>
                   <button class="btn btn-secondary btn-sm" style="color:var(--color-danger);" onclick="App.deleteCMSModule(${idx})" title="Hapus Modul">
                     Hapus
@@ -1230,15 +1376,23 @@ Tuliskan contoh praktikum di sini...
         </div>
 
         <!-- Bagian Video YouTube -->
-        <div style="background:#FFF5F5; padding:1rem; border-radius:var(--radius-md); border:1px solid #FECACA; margin-bottom:1.25rem;">
-          <div style="font-weight:700; font-size:0.9rem; color:#DC2626; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.4rem;">
-            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#DC2626;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            <span>Tautan Video Tutorial YouTube:</span>
+        <div style="background:#FFF5F5; padding:1.15rem; border-radius:var(--radius-md); border:1px solid #FECACA; margin-bottom:1.25rem;">
+          <div style="font-weight:700; font-size:0.92rem; color:#DC2626; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.4rem;">
+            <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:#DC2626;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <span>Tautan Video Tutorial YouTube (Terintegrasi ke Pemutar Materi):</span>
           </div>
           <p style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:0.6rem;">
-            Masukkan link video YouTube (contoh: <code>https://www.youtube.com/watch?v=BWZ-MHIhqjA</code> atau <code>https://youtu.be/...</code>).
+            Mendukung link <strong>youtube.com/watch?v=...</strong>, <strong>youtu.be/...</strong>, <strong>YouTube Shorts</strong>, <strong>Live</strong>, maupun <strong>kode sematan &lt;iframe&gt;</strong>.
           </p>
-          <input type="text" id="cms-form-yt" class="form-control" placeholder="https://www.youtube.com/watch?v=...">
+          <div class="form-group" style="margin-bottom:0.5rem;">
+            <label class="form-label" style="font-size:0.76rem;">Judul Video Tutorial (Opsional):</label>
+            <input type="text" id="cms-form-yt-title" class="form-control" placeholder="Contoh: Video Tutorial Konsep Dasar & Subnetting IPv4">
+          </div>
+          <div class="form-group" style="margin-bottom:0.35rem;">
+            <label class="form-label" style="font-size:0.76rem;">URL / Link Video YouTube:</label>
+            <input type="text" id="cms-form-yt" class="form-control" oninput="App.previewCMSVideoUrl()" placeholder="https://www.youtube.com/watch?v=BWZ-MHIhqjA atau https://youtu.be/...">
+          </div>
+          <div id="cms-yt-preview"></div>
         </div>
       </form>
     `;
@@ -1321,15 +1475,23 @@ Tuliskan contoh praktikum di sini...
         </div>
 
         <!-- Bagian Video YouTube -->
-        <div style="background:#FFF5F5; padding:1rem; border-radius:var(--radius-md); border:1px solid #FECACA; margin-bottom:1.25rem;">
-          <div style="font-weight:700; font-size:0.9rem; color:#DC2626; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.4rem;">
-            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#DC2626;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            <span>Tautan Video Tutorial YouTube:</span>
+        <div style="background:#FFF5F5; padding:1.15rem; border-radius:var(--radius-md); border:1px solid #FECACA; margin-bottom:1.25rem;">
+          <div style="font-weight:700; font-size:0.92rem; color:#DC2626; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.4rem;">
+            <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:#DC2626;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <span>Tautan Video Tutorial YouTube (Terintegrasi ke Pemutar Materi):</span>
           </div>
           <p style="font-size:0.75rem; color:var(--color-text-muted); margin-bottom:0.6rem;">
-            Masukkan link video YouTube (contoh: <code>https://www.youtube.com/watch?v=BWZ-MHIhqjA</code> atau <code>https://youtu.be/...</code>).
+            Mendukung link <strong>youtube.com/watch?v=...</strong>, <strong>youtu.be/...</strong>, <strong>YouTube Shorts</strong>, <strong>Live</strong>, maupun <strong>kode sematan &lt;iframe&gt;</strong>.
           </p>
-          <input type="text" id="cms-form-yt" class="form-control" value="${cur.videoUrl || ''}">
+          <div class="form-group" style="margin-bottom:0.5rem;">
+            <label class="form-label" style="font-size:0.76rem;">Judul Video Tutorial (Opsional):</label>
+            <input type="text" id="cms-form-yt-title" class="form-control" value="${cur.videoTitle || ''}" placeholder="Contoh: Video Tutorial Konsep Dasar & Subnetting IPv4">
+          </div>
+          <div class="form-group" style="margin-bottom:0.35rem;">
+            <label class="form-label" style="font-size:0.76rem;">URL / Link Video YouTube:</label>
+            <input type="text" id="cms-form-yt" class="form-control" value="${cur.videoUrl || ''}" oninput="App.previewCMSVideoUrl()" placeholder="https://www.youtube.com/watch?v=BWZ-MHIhqjA atau https://youtu.be/...">
+          </div>
+          <div id="cms-yt-preview"></div>
         </div>
       </form>
     `;
@@ -1343,6 +1505,7 @@ Tuliskan contoh praktikum di sini...
     `;
 
     openModal();
+    setTimeout(() => App.previewCMSVideoUrl(), 60);
   },
 
   saveCMSModuleForm(idx) {
@@ -1359,6 +1522,7 @@ Tuliskan contoh praktikum di sini...
     const wordFileUrl = document.getElementById('cms-form-wordurl') ? document.getElementById('cms-form-wordurl').value.trim() : '';
     const wordFileName = document.getElementById('cms-form-filename') ? document.getElementById('cms-form-filename').value.trim() : '';
     const videoUrl = document.getElementById('cms-form-yt') ? document.getElementById('cms-form-yt').value.trim() : '';
+    const videoTitle = document.getElementById('cms-form-yt-title') ? document.getElementById('cms-form-yt-title').value.trim() : '';
 
     const modules = NetLearnStore.getModules();
     const existing = (idx >= 0 && modules[idx]) ? modules[idx] : {};
@@ -1374,7 +1538,7 @@ Tuliskan contoh praktikum di sini...
       wordFileUrl,
       wordFileName: wordFileName || `Modul_${title.replace(/[^a-zA-Z0-9]/g, '_')}.docx`,
       videoUrl,
-      videoTitle: existing.videoTitle || `Tutorial: ${title}`,
+      videoTitle: videoTitle || existing.videoTitle || `Tutorial: ${title}`,
       pptSlides: existing.pptSlides || [
         {
           title: title,
@@ -1392,10 +1556,17 @@ Tuliskan contoh praktikum di sini...
     NetLearnStore.saveModule(modData, idx);
     closeModal();
 
+    // SINKRONISASI INDEKS MATERI: Otomatis set activeMateriIndex ke modul yang baru dibuat/disunting
+    const targetIdx = (idx >= 0) ? idx : (NetLearnStore.getModules().length - 1);
+    NetLearnStore.state.activeMateriIndex = targetIdx;
+    NetLearnStore.state.activeSlideIndex = 0;
+    NetLearnStore.save();
+
     this.renderGuruCMSMateri();
     this.renderBeranda();
+    this.renderMateri();
 
-    showToast(`Modul "${title}" berhasil disimpan dan langsung terhubung ke layar siswa!`, 'success');
+    showToast(`Modul "${title}" berhasil disimpan dan langsung disinkronkan ke Layar Materi!`, 'success');
   },
 
   deleteCMSModule(idx) {
