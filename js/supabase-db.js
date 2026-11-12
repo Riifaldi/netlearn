@@ -9,23 +9,31 @@ const NetLearnSupabase = {
   realtimeChannel: null,
   isSyncing: false,
 
-  // Kunci penyimpanan konfigurasi lokal
+  // Kunci penyimpanan konfigurasi lokal & Default Proyek Supabase NetLearn
   CONFIG_KEY: 'netlearn_supabase_config',
+  DEFAULT_URL: 'https://vqadthcpbfekrvkdkfob.supabase.co',
+  DEFAULT_ANON_KEY: 'sb_publishable_hirLIUyQWTOWFlkp2t4jIw_9xxsJ0IQ',
 
   // Ambil konfigurasi tersimpan
   getConfig() {
-    try {
-      const raw = localStorage.getItem(this.CONFIG_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {
-      console.warn('Gagal membaca konfigurasi Supabase:', e);
-    }
-    return {
-      url: '',
-      anonKey: '',
+    let cfg = {
+      url: this.DEFAULT_URL,
+      anonKey: this.DEFAULT_ANON_KEY,
       autoSync: true,
       lastSynced: null
     };
+    try {
+      const raw = localStorage.getItem(this.CONFIG_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        cfg = { ...cfg, ...parsed };
+      }
+    } catch (e) {
+      console.warn('Gagal membaca konfigurasi Supabase:', e);
+    }
+    if (!cfg.url) cfg.url = this.DEFAULT_URL;
+    if (!cfg.anonKey) cfg.anonKey = this.DEFAULT_ANON_KEY;
+    return cfg;
   },
 
   // Simpan konfigurasi
@@ -78,12 +86,12 @@ const NetLearnSupabase = {
       });
       const { data, error } = await testClient.from('modules').select('id').limit(1);
       if (error) {
-        // Jika tabel belum dibuat, periksa kode pesan error
-        if (error.code === '42P01') {
+        // Jika tabel belum dibuat, periksa kode pesan error (42P01 di postgres atau PGRST205 di PostgREST)
+        if (error.code === '42P01' || error.code === 'PGRST205') {
           return {
             success: true,
             warning: true,
-            message: 'Terkoneksi ke Supabase! Namun tabel database belum dibuat. Silakan jalankan script SQL Schema di SQL Editor Supabase.'
+            message: 'Koneksi ke Supabase Berhasil! Namun tabel database belum dibuat. Silakan salin script SQL Schema di bawah dan jalankan di SQL Editor Supabase.'
           };
         }
         return { success: false, message: `Error Supabase: ${error.message} (${error.code || 'Gagal'})` };
