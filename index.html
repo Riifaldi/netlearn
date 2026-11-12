@@ -1496,6 +1496,9 @@
               <button id="btn-db-tab-guru" class="db-tab-btn" onclick="App.switchDatabaseTab('guru')">
                 Database Akun Guru
               </button>
+              <button id="btn-db-tab-cloud" class="db-tab-btn" onclick="App.switchDatabaseTab('cloud')" style="color:#059669; font-weight:700;">
+                ⚡ Cloud Database (Supabase)
+              </button>
             </div>
 
             <!-- Tab Content Mount -->
@@ -1528,6 +1531,10 @@
 
   <!-- Toast Notification Container -->
   <div id="toast-container"></div>
+
+  <!-- Supabase Cloud Database Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-db.js"></script>
 
   <!-- Application Logic Scripts -->
   <script src="js/store.js"></script>

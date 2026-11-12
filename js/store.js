@@ -702,6 +702,11 @@ const NetLearnStore = {
       }
     }
     this.save();
+
+    // Sinkronisasi progres siswa ke Supabase Cloud
+    if (typeof window !== 'undefined' && window.NetLearnSupabase && window.NetLearnSupabase.isConfigured() && rec) {
+      window.NetLearnSupabase.syncSaveStudent(rec);
+    }
   },
 
   // Helper Methods untuk Modul Pembelajaran
@@ -730,10 +735,17 @@ const NetLearnStore = {
       this.state.materiProgress.push(false);
     }
     this.save();
+
+    // Sinkronisasi otomatis ke Supabase Cloud
+    if (typeof window !== 'undefined' && window.NetLearnSupabase && window.NetLearnSupabase.isConfigured()) {
+      const savedItem = (typeof index === 'number' && index >= 0) ? this.state.modulesData[index] : modData;
+      window.NetLearnSupabase.syncSaveModule(savedItem, typeof index === 'number' ? index : this.state.modulesData.length - 1);
+    }
   },
 
   deleteModule(index) {
     if (this.state.modulesData && this.state.modulesData[index]) {
+      const targetId = this.state.modulesData[index].id || (index + 1);
       this.state.modulesData.splice(index, 1);
       if (this.state.materiProgress) {
         this.state.materiProgress.splice(index, 1);
@@ -742,6 +754,11 @@ const NetLearnStore = {
         this.state.activeMateriIndex = Math.max(0, this.state.modulesData.length - 1);
       }
       this.save();
+
+      // Hapus di Supabase Cloud
+      if (typeof window !== 'undefined' && window.NetLearnSupabase && window.NetLearnSupabase.isConfigured() && targetId) {
+        window.NetLearnSupabase.syncDeleteModule(targetId);
+      }
     }
   },
 
@@ -864,6 +881,12 @@ const NetLearnStore = {
 
     this.state.studentRecords.unshift(newStudent);
     this.save();
+
+    // Sinkronisasi siswa ke Supabase Cloud
+    if (typeof window !== 'undefined' && window.NetLearnSupabase && window.NetLearnSupabase.isConfigured()) {
+      window.NetLearnSupabase.syncSaveStudent(newStudent);
+    }
+
     return { success: true, student: newStudent };
   },
 
@@ -907,6 +930,12 @@ const NetLearnStore = {
     }
 
     this.save();
+
+    // Sinkronisasi update siswa ke Supabase Cloud
+    if (typeof window !== 'undefined' && window.NetLearnSupabase && window.NetLearnSupabase.isConfigured()) {
+      window.NetLearnSupabase.syncSaveStudent(this.state.studentRecords[idx]);
+    }
+
     return { success: true, student: this.state.studentRecords[idx] };
   },
 

@@ -3181,7 +3181,7 @@ Tuliskan contoh praktikum di sini...
   // =========================================================================
   // Screen 6: Pusat Manajemen Database & Cadangan Data (Full Database Center)
   // =========================================================================
-  databaseActiveTab: 'siswa', // 'siswa' | 'modul' | 'soal' | 'guru'
+  databaseActiveTab: 'siswa', // 'siswa' | 'modul' | 'soal' | 'guru' | 'cloud'
 
   switchDatabaseTab(tab) {
     this.databaseActiveTab = tab;
@@ -3189,11 +3189,13 @@ Tuliskan contoh praktikum di sini...
     const btnModul = document.getElementById('btn-db-tab-modul');
     const btnSoal = document.getElementById('btn-db-tab-soal');
     const btnGuru = document.getElementById('btn-db-tab-guru');
+    const btnCloud = document.getElementById('btn-db-tab-cloud');
 
     if (btnSiswa) btnSiswa.classList.toggle('active', tab === 'siswa');
     if (btnModul) btnModul.classList.toggle('active', tab === 'modul');
     if (btnSoal) btnSoal.classList.toggle('active', tab === 'soal');
     if (btnGuru) btnGuru.classList.toggle('active', tab === 'guru');
+    if (btnCloud) btnCloud.classList.toggle('active', tab === 'cloud');
 
     this.renderGuruDatabaseTab();
   },
@@ -3382,6 +3384,123 @@ Tuliskan contoh praktikum di sini...
           </div>
         </div>
       `;
+    } else if (this.databaseActiveTab === 'cloud') {
+      const isConnected = typeof NetLearnSupabase !== 'undefined' && NetLearnSupabase.isConfigured();
+      const cfg = typeof NetLearnSupabase !== 'undefined' ? NetLearnSupabase.getConfig() : { url: '', anonKey: '', autoSync: true, lastSynced: null };
+
+      mount.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+          <div>
+            <h4 style="margin:0; font-size:1.1rem; font-weight:800; color:var(--color-primary); display:flex; align-items:center; gap:0.5rem;">
+              <span>⚡ Sinkronisasi Cloud Database (Supabase PostgreSQL)</span>
+              ${isConnected ? `
+                <span class="badge" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-size:0.75rem;">● Online &amp; Terhubung</span>
+              ` : `
+                <span class="badge" style="background:#FFFBEB; color:#92400E; border:1px solid #FDE68A; font-size:0.75rem;">○ Mode Offline (LocalStorage)</span>
+              `}
+            </h4>
+            <p style="margin:0.25rem 0 0 0; font-size:0.82rem; color:var(--color-text-muted);">
+              Menghubungkan seluruh komputer siswa dan laptop guru dalam satu basis data terpusat secara real-time.
+            </p>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="App.copySupabaseSQL()" style="display:inline-flex; align-items:center; gap:0.35rem;">
+              📋 Salin Script SQL Schema
+            </button>
+            ${isConnected ? `
+              <button class="btn btn-primary btn-sm" onclick="App.supabasePullNow()" style="display:inline-flex; align-items:center; gap:0.35rem;">
+                🔄 Tarik Data Cloud (Pull)
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="App.supabasePushNow()" style="background:#059669; border-color:#059669; display:inline-flex; align-items:center; gap:0.35rem;">
+                ⬆️ Unggah Semua ke Cloud (Push All)
+              </button>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- Kartu Pengaturan Koneksi Supabase -->
+        <div class="card" style="padding:1.5rem; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; margin-bottom:1.5rem;">
+          <h5 style="margin:0 0 1rem 0; font-size:0.95rem; font-weight:700; color:var(--color-primary); display:flex; align-items:center; gap:0.4rem;">
+            <span>🔑 Kredensial Proyek Supabase Anda</span>
+          </h5>
+
+          <form id="form-supabase-config" onsubmit="event.preventDefault(); App.saveSupabaseConfig();">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+              <div class="form-group">
+                <label class="form-label" style="font-weight:600; font-size:0.82rem;">Supabase Project URL:</label>
+                <input type="url" id="supabase-input-url" class="form-control" placeholder="https://xxxxxxxxxxxx.supabase.co" value="${cfg.url || ''}" required style="font-family:var(--font-mono); font-size:0.85rem;">
+                <span style="font-size:0.72rem; color:var(--color-text-muted);">Didapat dari: Supabase Dashboard -> Project Settings -> API -> Project URL</span>
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-weight:600; font-size:0.82rem;">Supabase Anon Public API Key:</label>
+                <input type="text" id="supabase-input-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..." value="${cfg.anonKey || ''}" required style="font-family:var(--font-mono); font-size:0.85rem;">
+                <span style="font-size:0.72rem; color:var(--color-text-muted);">Didapat dari: Supabase Dashboard -> Project Settings -> API -> anon public key</span>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; padding-top:0.5rem; border-top:1px solid #E2E8F0;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <input type="checkbox" id="supabase-auto-sync" ${cfg.autoSync !== false ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--color-interactive);">
+                <label for="supabase-auto-sync" style="font-size:0.82rem; font-weight:600; color:var(--color-text); cursor:pointer;">
+                  Aktifkan Sinkronisasi Real-Time Otomatis (Live Sync Guru &amp; Siswa)
+                </label>
+              </div>
+
+              <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="App.testSupabaseConnection()">
+                  🔍 Uji Koneksi Database
+                </button>
+                <button type="submit" class="btn btn-primary btn-sm" style="background:#059669; border-color:#059669; font-weight:700;">
+                  💾 Simpan &amp; Aktifkan Supabase
+                </button>
+                ${isConnected ? `
+                  <button type="button" class="btn btn-sm" onclick="App.disconnectSupabase()" style="color:#DC2626; background:#FEE2E2; border:1px solid #FCA5A5;">
+                    Putuskan
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Panduan 3 Langkah Menghubungkan Supabase -->
+        <div class="card" style="padding:1.5rem; border:1px solid var(--color-border); border-radius:12px;">
+          <h5 style="margin:0 0 0.85rem 0; font-size:0.95rem; font-weight:700; color:var(--color-primary);">
+            📖 Panduan Cepat Menghubungkan Supabase (Hanya 3 Menit):
+          </h5>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem;">
+            <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:1rem;">
+              <div style="display:flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.88rem; color:#0284C7; margin-bottom:0.4rem;">
+                <span style="background:#E0F2FE; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">1</span>
+                Buat Proyek Gratis di Supabase
+              </div>
+              <p style="margin:0; font-size:0.78rem; color:var(--color-text-muted); line-height:1.5;">
+                Buka <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--color-interactive); font-weight:600;">supabase.com</a>, daftar akun gratis, lalu klik <strong>New Project</strong> (beri nama misal <code>netlearn-smkn3</code>).
+              </p>
+            </div>
+
+            <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:1rem;">
+              <div style="display:flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.88rem; color:#059669; margin-bottom:0.4rem;">
+                <span style="background:#DCFCE7; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">2</span>
+                Eksekusi Script SQL Schema
+              </div>
+              <p style="margin:0; font-size:0.78rem; color:var(--color-text-muted); line-height:1.5;">
+                Klik tombol <strong>📋 Salin Script SQL Schema</strong> di pojok kanan atas, lalu di dashboard Supabase buka menu <strong>SQL Editor</strong> -&gt; <strong>New Query</strong> -&gt; Paste dan klik <strong>Run</strong>.
+              </p>
+            </div>
+
+            <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:1rem;">
+              <div style="display:flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.88rem; color:#7C3AED; margin-bottom:0.4rem;">
+                <span style="background:#F3E8FF; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem;">3</span>
+                Salin Kunci API &amp; Selesai!
+              </div>
+              <p style="margin:0; font-size:0.78rem; color:var(--color-text-muted); line-height:1.5;">
+                Buka menu <strong>Project Settings -&gt; API</strong>, salin <strong>Project URL</strong> dan <strong>anon public key</strong> ke form di atas, lalu klik <strong>Simpan &amp; Aktifkan Supabase</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
     } else {
       const teachers = NetLearnStore.state.teachersList || [];
       mount.innerHTML = `
@@ -3416,6 +3535,105 @@ Tuliskan contoh praktikum di sini...
         </div>
       `;
     }
+  },
+
+  // -------------------------------------------------------------------------
+  // SUPABASE CLOUD DATABASE HANDLERS
+  // -------------------------------------------------------------------------
+  async saveSupabaseConfig() {
+    const urlInput = document.getElementById('supabase-input-url');
+    const keyInput = document.getElementById('supabase-input-key');
+    const syncCheckbox = document.getElementById('supabase-auto-sync');
+
+    const url = urlInput ? urlInput.value.trim() : '';
+    const anonKey = keyInput ? keyInput.value.trim() : '';
+    const autoSync = syncCheckbox ? syncCheckbox.checked : true;
+
+    if (!url || !anonKey) {
+      alert('Project URL dan Anon Key Supabase wajib diisi!');
+      return;
+    }
+
+    if (typeof showToast === 'function') showToast('Menguji koneksi ke Supabase...', 'info');
+    const test = await NetLearnSupabase.testConnection(url, anonKey);
+    if (!test.success) {
+      alert(test.message);
+      return;
+    }
+
+    NetLearnSupabase.saveConfig({ url, anonKey, autoSync });
+    this.renderGuruDatabase();
+    if (typeof showToast === 'function') showToast('Koneksi Supabase aktif! Sinkronisasi otomatis berjalan.', 'success');
+
+    if (confirm('Koneksi Supabase berhasil! Apakah Anda ingin langsung mengunggah (push) seluruh materi dan data siswa yang ada saat ini ke database cloud Supabase?')) {
+      this.supabasePushNow();
+    }
+  },
+
+  async testSupabaseConnection() {
+    const urlInput = document.getElementById('supabase-input-url');
+    const keyInput = document.getElementById('supabase-input-key');
+    const url = urlInput ? urlInput.value.trim() : '';
+    const anonKey = keyInput ? keyInput.value.trim() : '';
+    if (!url || !anonKey) {
+      alert('Masukkan Project URL dan Anon Key terlebih dahulu.');
+      return;
+    }
+    if (typeof showToast === 'function') showToast('Menguji koneksi ke Supabase...', 'info');
+    const res = await NetLearnSupabase.testConnection(url, anonKey);
+    alert(res.message);
+  },
+
+  async supabasePullNow() {
+    if (typeof showToast === 'function') showToast('Menarik data terbaru dari cloud...', 'info');
+    const ok = await NetLearnSupabase.pullFromCloud(false);
+    if (ok) {
+      this.renderGuruDatabase();
+      if (this.materiViewMode === 'video' && NetLearnStore.state.activeScreen === 'materi') {
+        this.renderMateri();
+      }
+    }
+  },
+
+  async supabasePushNow() {
+    if (typeof showToast === 'function') showToast('Mengunggah data lokal ke cloud Supabase...', 'info');
+    const res = await NetLearnSupabase.pushAllToCloud();
+    alert(res.message);
+    if (res.success) {
+      this.renderGuruDatabase();
+    }
+  },
+
+  disconnectSupabase() {
+    if (confirm('Putuskan koneksi dari Supabase? Aplikasi akan kembali menggunakan mode penyimpanan lokal (LocalStorage).')) {
+      localStorage.removeItem(NetLearnSupabase.CONFIG_KEY);
+      if (NetLearnSupabase.client) NetLearnSupabase.client = null;
+      this.renderGuruDatabase();
+      if (typeof showToast === 'function') showToast('Koneksi Supabase diputuskan. Menggunakan mode lokal.', 'info');
+    }
+  },
+
+  copySupabaseSQL() {
+    const sql = NetLearnSupabase.getSQLSchema();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(sql).then(() => {
+        if (typeof showToast === 'function') showToast('Script SQL Schema berhasil disalin ke clipboard! Buka SQL Editor di Supabase untuk menjalankannya.', 'success');
+      }).catch(() => {
+        this.fallbackCopyText(sql);
+      });
+    } else {
+      this.fallbackCopyText(sql);
+    }
+  },
+
+  fallbackCopyText(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (typeof showToast === 'function') showToast('Script SQL Schema berhasil disalin!', 'success');
   },
 
   // =========================================================================
