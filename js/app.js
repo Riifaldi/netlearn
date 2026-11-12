@@ -690,33 +690,7 @@ const App = {
             <!-- Content Area PPT / Video -->
             <div class="materi-ppt-frame-area">
               ${this.materiViewMode === 'video' ? (
-                hasVideo ? (
-                  isNativeVideo ? `
-                    <div style="width:100%; height:100%; min-height:480px; background:#000; display:flex; align-items:center; justify-content:center;">
-                      <video src="${cur.videoUrl}" controls playsinline autoplay controlsList="nodownload" style="width:100%; height:100%; max-height:560px; object-fit:contain;"></video>
-                    </div>
-                  ` : `
-                    ${isFileProtocol ? `
-                      <div style="background:#FFFBEB; border-bottom:1px solid #FDE68A; padding:0.6rem 1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:0.4rem;">
-                          <span>⚠️</span>
-                          <span><strong>Protokol Lokal (file:///):</strong> Jika muncul <em>Error 153</em> dari kebijakan YouTube, jalankan via <strong>Jalankan_NetLearn.bat</strong> atau klik tombol merah di samping. Di server web / hosting Vercel, video otomatis berputar langsung.</span>
-                        </div>
-                        <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-sm" style="background:#DC2626; color:#FFF; font-weight:700; border-radius:6px; font-size:0.75rem; text-decoration:none; padding:0.3rem 0.75rem;">
-                          ▶ Buka Video di YouTube ↗
-                        </a>
-                      </div>
-                    ` : ''}
-                    <iframe id="materi-video-main-iframe" 
-                            class="materi-ppt-iframe" 
-                            src="${ytEmbedUrl}" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen 
-                            title="${cur.videoTitle || 'Video Tutorial YouTube'}">
-                    </iframe>
-                  `
-                ) : `
+                hasVideo ? this.renderVideoPlayer(cur, modIdx, true) : `
                   <div style="height:100%; min-height:420px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem; text-align:center; color:#FFF; background:#0F172A; border-radius:0 0 12px 12px;">
                     <div style="font-size:3rem; margin-bottom:0.75rem;">🎥</div>
                     <h3 style="color:#FFF; font-size:1.25rem; font-weight:700; margin-bottom:0.5rem;">Video Belum Ditambahkan untuk Modul Ini</h3>
@@ -855,43 +829,7 @@ const App = {
               </div>
 
               <div class="materi-video-player-wrap">
-                ${isNativeVideo ? `
-                  <div style="width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center;">
-                    <video src="${cur.videoUrl}" controls playsinline controlsList="nodownload" style="width:100%; height:100%; min-height:400px; max-height:520px; object-fit:contain;"></video>
-                  </div>
-                ` : (
-                  ytEmbedUrl ? `
-                    ${isFileProtocol ? `
-                      <div style="background:#FFFBEB; border-bottom:1px solid #FDE68A; padding:0.6rem 1rem; font-size:0.78rem; color:#92400E; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap;">
-                        <div style="display:flex; align-items:center; gap:0.4rem;">
-                          <span>⚠️</span>
-                          <span><strong>Protokol Lokal (file:///):</strong> Jika muncul <em>Error 153</em> dari YouTube, klik tombol di samping atau jalankan melalui <strong>Jalankan_NetLearn.bat</strong>. Di hosting live Vercel video berputar normal 100%.</span>
-                        </div>
-                        <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-sm" style="background:#DC2626; color:#FFF; font-weight:700; border-radius:6px; font-size:0.75rem; text-decoration:none; padding:0.3rem 0.75rem;">
-                          ▶ Buka Video di YouTube ↗
-                        </a>
-                      </div>
-                    ` : ''}
-                    <iframe src="${ytEmbedUrl}" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen 
-                            title="${cur.videoTitle || 'Video Tutorial YouTube'}">
-                    </iframe>
-                  ` : `
-                    <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; color:#FFF; background:#0F172A;">
-                      <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎥</div>
-                      <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.5rem;">${cur.videoTitle || 'Video Tutorial Modul'}</h4>
-                      <p style="color:#94A3B8; max-width:480px; font-size:0.85rem; margin-bottom:1.25rem;">
-                        Tautan video terlampir: <code>${cur.videoUrl}</code>
-                      </p>
-                      <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; display:inline-flex; align-items:center; gap:0.4rem;">
-                        <span>▶ Putar Video di YouTube Tab Baru</span>
-                        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                      </a>
-                    </div>
-                  `
-                )}
+                ${this.renderVideoPlayer(cur, modIdx, false)}
               </div>
 
               <div class="video-section-footer">
@@ -1100,6 +1038,91 @@ const App = {
       return `https://www.youtube.com/watch?v=${videoId}`;
     }
     return url.trim();
+  },
+
+  // Render Pemutar Video Universal (Mendukung Video Lokal MP4, YouTube Embed di Localhost/Hosting, dan Poster Interaktif jika file:///)
+  renderVideoPlayer(cur, modIdx, isHero = false) {
+    if (!cur || !cur.videoUrl || !cur.videoUrl.trim()) return '';
+
+    const isNativeVideo = Boolean(
+      cur.videoUrl.endsWith('.mp4') || 
+      cur.videoUrl.endsWith('.webm') || 
+      cur.videoUrl.startsWith('blob:') || 
+      cur.videoUrl.startsWith('data:video/')
+    );
+    const ytVideoId = !isNativeVideo ? this.extractYoutubeId(cur.videoUrl) : '';
+    const ytEmbedUrl = !isNativeVideo ? this.getYoutubeEmbedUrl(cur.videoUrl) : '';
+    const ytWatchUrl = !isNativeVideo ? this.getYoutubeWatchUrl(cur.videoUrl) : '';
+    const isFileProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:');
+
+    // 1. Berkas Video Native (.mp4, .webm, blob) -> Putar via elemen <video> langsung di semua protokol
+    if (isNativeVideo) {
+      return `
+        <div style="width:100%; height:100%; min-height:${isHero ? '480px' : '380px'}; background:#000; display:flex; align-items:center; justify-content:center;">
+          <video src="${cur.videoUrl}" controls playsinline controlsList="nodownload" style="width:100%; height:100%; max-height:560px; object-fit:contain;"></video>
+        </div>
+      `;
+    }
+
+    // 2. Video YouTube dibuka langsung via file:/// -> Cegah Error 153 dari YouTube dengan Player Hub Interaktif Berkualitas Tinggi
+    if (isFileProtocol) {
+      const thumbUrl = ytVideoId ? `https://img.youtube.com/vi/${ytVideoId}/hqdefault.jpg` : '';
+      return `
+        <div class="materi-video-fallback-card" style="width:100%; height:100%; min-height:${isHero ? '460px' : '380px'}; position:relative; background:#0B1120; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; text-align:center; padding:1.5rem; border-radius:${isHero ? '0 0 12px 12px' : 'var(--radius-lg)'}; box-sizing:border-box;">
+          ${thumbUrl ? `
+            <div style="position:absolute; inset:0; background:url('${thumbUrl}') center/cover no-repeat; filter:brightness(0.32) blur(3px); transform:scale(1.06); z-index:1;"></div>
+          ` : ''}
+          <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,17,32,0.45) 0%, rgba(11,17,32,0.92) 100%); z-index:2;"></div>
+          
+          <div style="position:relative; z-index:3; max-width:620px; width:100%; display:flex; flex-direction:column; align-items:center; gap:0.85rem; padding:0 0.5rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
+              <span style="background:#DC2626; color:#FFF; font-size:0.72rem; font-weight:700; padding:0.25rem 0.7rem; border-radius:999px; letter-spacing:0.04em; text-transform:uppercase; box-shadow:0 2px 8px rgba(220,38,38,0.45);">
+                ▶ YouTube Tutorial
+              </span>
+              <span style="background:rgba(255,255,255,0.18); color:#F1F5F9; font-size:0.72rem; font-weight:600; padding:0.25rem 0.7rem; border-radius:999px; backdrop-filter:blur(6px); border:1px solid rgba(255,255,255,0.2);">
+                Modul ${modIdx + 1}: ${cur.title || 'Materi'}
+              </span>
+            </div>
+
+            <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" title="Klik untuk Memutar Video di YouTube" style="text-decoration:none; display:flex; align-items:center; justify-content:center; width:68px; height:68px; border-radius:50%; background:#DC2626; color:#FFF; box-shadow:0 0 25px rgba(220,38,38,0.6); transition:transform 0.2s, box-shadow 0.2s; cursor:pointer; margin:0.25rem 0;" onmouseover="this.style.transform='scale(1.12)';this.style.boxShadow='0 0 35px rgba(220,38,38,0.85)';" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 25px rgba(220,38,38,0.6)';">
+              <svg viewBox="0 0 24 24" style="width:30px; height:30px; fill:currentColor; margin-left:3px;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </a>
+
+            <h3 style="color:#FFF; font-size:1.18rem; font-weight:700; margin:0; line-height:1.4; text-shadow:0 2px 8px rgba(0,0,0,0.85);">
+              ${cur.videoTitle || 'Tutorial Konsep Pengalamatan IP Address & Konversi Biner'}
+            </h3>
+
+            <div style="display:flex; gap:0.65rem; flex-wrap:wrap; justify-content:center; margin-top:0.35rem;">
+              <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn" style="background:#DC2626; color:#FFF; font-weight:700; border-radius:8px; font-size:0.85rem; padding:0.55rem 1.2rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.45rem; box-shadow:0 4px 14px rgba(220,38,38,0.45);">
+                <span>▶ Tonton Video di YouTube</span>
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+              <a href="http://localhost:3000/index.html" class="btn" style="background:rgba(255,255,255,0.15); color:#F8FAFC; border:1px solid rgba(255,255,255,0.3); font-weight:600; border-radius:8px; font-size:0.85rem; padding:0.55rem 1.1rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.45rem; backdrop-filter:blur(6px);">
+                <span>🚀 Buka via Localhost (Putar Langsung)</span>
+              </a>
+            </div>
+
+            <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:0.5rem 0.85rem; margin-top:0.4rem; max-width:520px;">
+              <p style="color:#CBD5E1; font-size:0.75rem; margin:0; line-height:1.45;">
+                ℹ️ <strong>Kenapa butuh Localhost / YouTube?</strong> Browser (Chrome/Edge) membatasi pemutaran langsung YouTube pada berkas lokal (<code>file:///</code>). Jalankan <strong>Jalankan_NetLearn.bat</strong> atau buka via hosting Vercel agar video otomatis terputar langsung di dalam website tanpa keluar tab.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. YouTube Embed Standar pada HTTP / HTTPS (Localhost 3000 atau Hosting Vercel) -> 100% Berputar Langsung Bebas Error 153
+    return `
+      <iframe id="${isHero ? 'materi-video-main-iframe' : 'materi-video-section-iframe'}" 
+              class="materi-ppt-iframe" 
+              src="${ytEmbedUrl}" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              referrerpolicy="strict-origin-when-cross-origin" 
+              allowfullscreen 
+              title="${cur.videoTitle || 'Video Tutorial YouTube'}">
+      </iframe>
+    `;
   },
 
   // Pratinjau Tautan Video YouTube / Berkas Lokal Secara Real-Time pada Modal CMS

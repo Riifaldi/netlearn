@@ -17,25 +17,23 @@ echo.
 
 cd /d "%~dp0"
 
+where node >nul 2>nul
+if %ERRORLEVEL% equ 0 (
+    echo [STATUS] Menjalankan server lokal menggunakan Node.js (Port 3000)...
+    start http://localhost:3000/index.html
+    node server.js
+    goto selesai
+)
+
 where python >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    echo [STATUS] Menjalankan server menggunakan Python (Port 3000)...
-    echo [STATUS] Membuka Google Chrome / Browser Utama...
+    echo [STATUS] Menjalankan server lokal menggunakan Python (Port 3000)...
     start http://localhost:3000/index.html
     python -m http.server 3000
     goto selesai
 )
 
-where node >nul 2>nul
-if %ERRORLEVEL% equ 0 (
-    echo [STATUS] Menjalankan server menggunakan Node.js (Port 3000)...
-    echo [STATUS] Membuka Google Chrome / Browser Utama...
-    start http://localhost:3000/index.html
-    npx -y serve -l 3000 .
-    goto selesai
-)
-
-echo [PERINGATAN] Python atau Node.js tidak terdeteksi di PATH sistem.
+echo [PERINGATAN] Node.js atau Python tidak ditemukan di PATH.
 echo Membuka aplikasi langsung via browser...
 start index.html
 
