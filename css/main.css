@@ -365,27 +365,7 @@ p {
 }
 
 .nav-badge {
-  margin-left: auto;
-  font-size: 0.63rem;
-  font-weight: 700;
-  padding: 0.12rem 0.45rem;
-  border-radius: var(--radius-full);
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.2s ease,
-              color 0.2s ease;
-}
-
-.nav-item-btn:hover .nav-badge {
-  transform: scale(1.06);
-  background: rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.85);
-}
-
-.nav-item-btn.active .nav-badge {
-  background: rgba(79,110,247,0.3);
-  color: #93B4FF;
+  display: none !important;
 }
 
 /* Sidebar Footer */

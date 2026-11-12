@@ -467,11 +467,19 @@ const App = {
   // Screen 3: Materi Interaktif (Dinamis Terhubung Langsung dengan CMS Guru)
   // Menampilkan PPT sebagai fokus utama, Tombol Penjelasan Rinci (Word), dan YouTube
   // =========================================================================
+  materiViewMode: 'ppt', // 'ppt' | 'video'
+
+  setMateriViewMode(mode) {
+    this.materiViewMode = mode;
+    this.renderMateri();
+  },
+
   renderMateri() {
     const mount = document.getElementById('materi-dynamic-mount');
     if (!mount) return;
 
     const modules = NetLearnStore.getModules();
+    const isGuru = (NetLearnStore.state.currentRole === 'guru');
 
     // 1. JIKA MODUL KOSONG: Tampilkan Empty State Edukatif yang Bersih
     if (!modules || modules.length === 0) {
@@ -516,7 +524,6 @@ const App = {
     NetLearnStore.save();
 
     const cur = modules[modIdx];
-    const isGuru = (NetLearnStore.state.currentRole === 'guru');
 
     // Slide PPT State
     const slideIdx = NetLearnStore.state.activeSlideIndex || 0;
@@ -524,11 +531,17 @@ const App = {
     const hasEmbedPPT = Boolean(cur.pptUrl && cur.pptUrl.trim());
     const embedPPTUrl = hasEmbedPPT ? this.getSlidesEmbedUrl(cur.pptUrl) : '';
 
-    // Video YouTube State
+    // Video YouTube & Native Video State
     const hasVideo = Boolean(cur.videoUrl && cur.videoUrl.trim());
-    const ytVideoId = this.extractYoutubeId(cur.videoUrl);
-    const ytEmbedUrl = this.getYoutubeEmbedUrl(cur.videoUrl);
-    const ytWatchUrl = this.getYoutubeWatchUrl(cur.videoUrl);
+    const isNativeVideo = Boolean(cur.videoUrl && (
+      cur.videoUrl.endsWith('.mp4') || 
+      cur.videoUrl.endsWith('.webm') || 
+      cur.videoUrl.startsWith('blob:') || 
+      cur.videoUrl.startsWith('data:video/')
+    ));
+    const ytVideoId = !isNativeVideo ? this.extractYoutubeId(cur.videoUrl) : '';
+    const ytEmbedUrl = !isNativeVideo ? this.getYoutubeEmbedUrl(cur.videoUrl) : '';
+    const ytWatchUrl = !isNativeVideo ? this.getYoutubeWatchUrl(cur.videoUrl) : '';
 
     // Hitung Progress
     const doneCount = NetLearnStore.state.materiProgress.filter(Boolean).length;
@@ -609,7 +622,7 @@ const App = {
 
             <!-- Quick Media Navigation Bar -->
             <div class="materi-media-nav-bar" style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; margin-top:1rem; padding-top:0.85rem; border-top:1px solid var(--color-border);">
-              <button class="btn btn-secondary btn-sm" onclick="App.scrollToMateriElement('materi-ppt-wrapper-el')" style="display:inline-flex; align-items:center; gap:0.35rem;">
+              <button class="btn btn-secondary btn-sm" onclick="App.setMateriViewMode('ppt'); App.scrollToMateriElement('materi-ppt-wrapper-el')" style="display:inline-flex; align-items:center; gap:0.35rem;">
                 <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                 <span>Slide Presentasi (${slides.length > 0 ? `${slides.length} Slide` : 'PPT'})</span>
               </button>
@@ -620,9 +633,9 @@ const App = {
               </button>
 
               ${hasVideo ? `
-                <button class="btn btn-primary btn-sm" onclick="App.scrollToMateriElement('materi-video-section-el')" style="display:inline-flex; align-items:center; gap:0.35rem; background:#DC2626; border-color:#DC2626;">
+                <button class="btn btn-primary btn-sm" onclick="App.setMateriViewMode('video'); App.scrollToMateriElement('materi-ppt-wrapper-el');" style="display:inline-flex; align-items:center; gap:0.35rem; background:#DC2626; border-color:#DC2626;">
                   <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                  <span>Video Tutorial YouTube (Tersedia) 🎥</span>
+                  <span>Putar Video di Web (Tersedia) 🎥</span>
                 </button>
               ` : `
                 <span style="font-size:0.75rem; color:var(--color-text-muted); display:inline-flex; align-items:center; gap:0.3rem;">
@@ -634,91 +647,147 @@ const App = {
           </div>
 
           <!-- ============================================================
-               KOMPONEN PALING MENONJOL: PPT MATERI (SLIDE PRESENTATION)
+               KOMPONEN PALING MENONJOL: PPT MATERI / PEMUTAR VIDEO LANGSUNG
                ============================================================ -->
           <section class="materi-ppt-wrapper" id="materi-ppt-wrapper-el">
-            <div class="materi-ppt-toolbar">
-              <div class="ppt-toolbar-title" style="display:flex; align-items:center; gap:0.5rem;">
-                <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--color-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                <span>Slide Presentasi Materi (PPT)</span>
+            <div class="materi-ppt-toolbar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+              <div class="materi-view-tabs" style="display:inline-flex; background:rgba(0,0,0,0.25); padding:3px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); gap:4px;">
+                <button class="btn btn-sm ${this.materiViewMode !== 'video' ? 'btn-primary' : 'btn-secondary'}" 
+                        style="border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; padding:0.35rem 0.85rem;"
+                        onclick="App.setMateriViewMode('ppt')">
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  <span>📊 Slide Presentasi PPT</span>
+                </button>
+                <button class="btn btn-sm ${this.materiViewMode === 'video' ? 'btn-primary' : 'btn-secondary'}" 
+                        style="border-radius:6px; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; padding:0.35rem 0.85rem; ${this.materiViewMode === 'video' ? 'background:#DC2626; border-color:#DC2626;' : ''}"
+                        onclick="App.setMateriViewMode('video')">
+                  <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                  <span>▶ Tonton Video Langsung 🎥 ${hasVideo ? '<span style="background:rgba(255,255,255,0.25); padding:1px 6px; border-radius:10px; font-size:0.65rem;">Tersedia</span>' : ''}</span>
+                </button>
               </div>
+
               <div class="ppt-toolbar-actions">
-                ${hasEmbedPPT ? `
-                  <a href="${cur.pptUrl}" target="_blank" rel="noopener" class="ppt-action-btn" title="Buka di Google Slides / Tab Baru">
-                    <span>↗ Buka Slide Asli</span>
-                  </a>
-                ` : ''}
+                ${this.materiViewMode === 'video' ? (
+                  hasVideo ? `
+                    <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="ppt-action-btn" title="Buka di YouTube / Tab Baru">
+                      <span>↗ Buka di Tab Baru</span>
+                    </a>
+                  ` : ''
+                ) : (
+                  hasEmbedPPT ? `
+                    <a href="${cur.pptUrl}" target="_blank" rel="noopener" class="ppt-action-btn" title="Buka di Google Slides / Tab Baru">
+                      <span>↗ Buka Slide Asli</span>
+                    </a>
+                  ` : ''
+                )}
                 <button class="ppt-action-btn" onclick="App.togglePPTFullscreen()" title="Tampilkan Layar Penuh">
                   <span>⛶ Layar Penuh</span>
                 </button>
               </div>
             </div>
 
-            <!-- Content Area PPT -->
+            <!-- Content Area PPT / Video -->
             <div class="materi-ppt-frame-area">
-              ${hasEmbedPPT ? `
-                <iframe id="materi-ppt-iframe" 
-                        class="materi-ppt-iframe" 
-                        src="${embedPPTUrl}" 
-                        allowfullscreen 
-                        title="Slide Presentasi Materi">
-                </iframe>
-              ` : `
-                <!-- Slide Player Interaktif Bawaan -->
-                <div class="slide-deck-player">
-                  <div class="slide-deck-top">
-                    <span class="badge badge-purple">INTERACTIVE SLIDE DECK</span>
-                    <span class="slide-counter-badge">Slide ${(slides.length > 0 ? slideIdx + 1 : 1)} dari ${(slides.length > 0 ? slides.length : 1)}</span>
-                  </div>
-
-                  <div class="slide-deck-content">
-                    ${slides.length > 0 ? `
-                      <h3 class="slide-main-title">${slides[slideIdx].title}</h3>
-                      <div class="slide-subtitle">${slides[slideIdx].subtitle || ''}</div>
-                      
-                      <ul class="slide-bullets-list">
-                        ${(slides[slideIdx].bullets || []).map(b => `
-                          <li class="slide-bullet-item">
-                            <span class="check-icon">✓</span>
-                            <span>${b}</span>
-                          </li>
-                        `).join('')}
-                      </ul>
-
-                      ${slides[slideIdx].highlight ? `
-                        <div class="slide-highlight-box">
-                          ${slides[slideIdx].highlight}
-                        </div>
+              ${this.materiViewMode === 'video' ? (
+                hasVideo ? (
+                  isNativeVideo ? `
+                    <div style="width:100%; height:100%; min-height:480px; background:#000; display:flex; align-items:center; justify-content:center;">
+                      <video src="${cur.videoUrl}" controls playsinline autoplay controlsList="nodownload" style="width:100%; height:100%; max-height:560px; object-fit:contain;"></video>
+                    </div>
+                  ` : `
+                    <iframe id="materi-video-main-iframe" 
+                            class="materi-ppt-iframe" 
+                            src="${ytEmbedUrl}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen 
+                            title="${cur.videoTitle || 'Video Tutorial YouTube'}">
+                    </iframe>
+                  `
+                ) : `
+                  <div style="height:100%; min-height:420px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem; text-align:center; color:#FFF; background:#0F172A; border-radius:0 0 12px 12px;">
+                    <div style="font-size:3rem; margin-bottom:0.75rem;">🎥</div>
+                    <h3 style="color:#FFF; font-size:1.25rem; font-weight:700; margin-bottom:0.5rem;">Video Belum Ditambahkan untuk Modul Ini</h3>
+                    <p style="color:#94A3B8; max-width:520px; font-size:0.88rem; margin-bottom:1.5rem; line-height:1.6;">
+                      Guru pengampu dapat memasukkan tautan YouTube atau memilih berkas video melalui Panel CMS Materi. Anda dapat mempelajari modul ini melalui Slide Presentasi dan Dokumen Rinci.
+                    </p>
+                    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center;">
+                      <button class="btn btn-secondary" onclick="App.setMateriViewMode('ppt')">
+                        📊 Kembali ke Slide Presentasi PPT
+                      </button>
+                      ${isGuru ? `
+                        <button class="btn btn-primary" style="background:#DC2626; border-color:#DC2626;" onclick="App.openEditCMSModal(${modIdx})">
+                          + Tambah Video di CMS Sekarang
+                        </button>
                       ` : ''}
-                    ` : `
-                      <div style="text-align:center; padding: 2rem 0;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
-                        <h3 class="slide-main-title">${cur.title}</h3>
-                        <p style="color:#CBD5E1; max-width:600px; margin: 0 auto;">${cur.subtitle}</p>
-                      </div>
-                    `}
+                    </div>
                   </div>
-
-                  <!-- Controls Navigasi Slide -->
-                  <div class="slide-deck-controls">
-                    <button class="slide-nav-btn" onclick="App.prevMateriSlide()" ${(slides.length <= 1 || slideIdx === 0) ? 'disabled' : ''}>
-                      ◀ Slide Sebelumnya
-                    </button>
-
-                    <div class="slide-dots-container">
-                      ${slides.map((_, i) => `
-                        <button class="slide-dot ${i === slideIdx ? 'active' : ''}" 
-                                onclick="App.setMateriSlide(${i})" 
-                                title="Buka Slide ${i + 1}"></button>
-                      `).join('')}
+                `
+              ) : (
+                hasEmbedPPT ? `
+                  <iframe id="materi-ppt-iframe" 
+                          class="materi-ppt-iframe" 
+                          src="${embedPPTUrl}" 
+                          allowfullscreen 
+                          title="Slide Presentasi Materi">
+                  </iframe>
+                ` : `
+                  <!-- Slide Player Interaktif Bawaan -->
+                  <div class="slide-deck-player">
+                    <div class="slide-deck-top">
+                      <span class="badge badge-purple">INTERACTIVE SLIDE DECK</span>
+                      <span class="slide-counter-badge">Slide ${(slides.length > 0 ? slideIdx + 1 : 1)} dari ${(slides.length > 0 ? slides.length : 1)}</span>
                     </div>
 
-                    <button class="slide-nav-btn" onclick="App.nextMateriSlide()" ${(slides.length <= 1 || slideIdx === slides.length - 1) ? 'disabled' : ''}>
-                      Slide Selanjutnya ▶
-                    </button>
+                    <div class="slide-deck-content">
+                      ${slides.length > 0 ? `
+                        <h3 class="slide-main-title">${slides[slideIdx].title}</h3>
+                        <div class="slide-subtitle">${slides[slideIdx].subtitle || ''}</div>
+                        
+                        <ul class="slide-bullets-list">
+                          ${(slides[slideIdx].bullets || []).map(b => `
+                            <li class="slide-bullet-item">
+                              <span class="check-icon">✓</span>
+                              <span>${b}</span>
+                            </li>
+                          `).join('')}
+                        </ul>
+
+                        ${slides[slideIdx].highlight ? `
+                          <div class="slide-highlight-box">
+                            ${slides[slideIdx].highlight}
+                          </div>
+                        ` : ''}
+                      ` : `
+                        <div style="text-align:center; padding: 2rem 0;">
+                          <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                          <h3 class="slide-main-title">${cur.title}</h3>
+                          <p style="color:#CBD5E1; max-width:600px; margin: 0 auto;">${cur.subtitle}</p>
+                        </div>
+                      `}
+                    </div>
+
+                    <!-- Controls Navigasi Slide -->
+                    <div class="slide-deck-controls">
+                      <button class="slide-nav-btn" onclick="App.prevMateriSlide()" ${(slides.length <= 1 || slideIdx === 0) ? 'disabled' : ''}>
+                        ◀ Slide Sebelumnya
+                      </button>
+
+                      <div class="slide-dots-container">
+                        ${slides.map((_, i) => `
+                          <button class="slide-dot ${i === slideIdx ? 'active' : ''}" 
+                                  onclick="App.setMateriSlide(${i})" 
+                                  title="Buka Slide ${i + 1}"></button>
+                        `).join('')}
+                      </div>
+
+                      <button class="slide-nav-btn" onclick="App.nextMateriSlide()" ${(slides.length <= 1 || slideIdx === slides.length - 1) ? 'disabled' : ''}>
+                        Slide Selanjutnya ▶
+                      </button>
+                    </div>
                   </div>
-                </div>
-              `}
+                `
+              )}
             </div>
           </section>
 
@@ -762,7 +831,7 @@ const App = {
             <section class="materi-video-section" id="materi-video-section-el">
               <div class="video-section-header">
                 <div class="video-title-wrap">
-                  <span class="video-yt-badge">YOUTUBE</span>
+                  <span class="video-yt-badge">${isNativeVideo ? 'VIDEO' : 'YOUTUBE'}</span>
                   <span>${cur.videoTitle || 'Video Tutorial Pembahasan Materi'}</span>
                 </div>
                 ${ytWatchUrl ? `
@@ -774,26 +843,32 @@ const App = {
               </div>
 
               <div class="materi-video-player-wrap">
-                ${ytEmbedUrl ? `
-                  <iframe src="${ytEmbedUrl}" 
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                          referrerpolicy="strict-origin-when-cross-origin"
-                          allowfullscreen 
-                          title="${cur.videoTitle || 'Video Tutorial YouTube'}">
-                  </iframe>
-                ` : `
-                  <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; color:#FFF; background:#0F172A;">
-                    <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎥</div>
-                    <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.5rem;">${cur.videoTitle || 'Video Tutorial Modul'}</h4>
-                    <p style="color:#94A3B8; max-width:480px; font-size:0.85rem; margin-bottom:1.25rem;">
-                      Tautan video terlampir: <code>${cur.videoUrl}</code>
-                    </p>
-                    <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; display:inline-flex; align-items:center; gap:0.4rem;">
-                      <span>▶ Putar Video di YouTube Tab Baru</span>
-                      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                    </a>
+                ${isNativeVideo ? `
+                  <div style="width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center;">
+                    <video src="${cur.videoUrl}" controls playsinline controlsList="nodownload" style="width:100%; height:100%; min-height:400px; max-height:520px; object-fit:contain;"></video>
                   </div>
-                `}
+                ` : (
+                  ytEmbedUrl ? `
+                    <iframe src="${ytEmbedUrl}" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen 
+                            title="${cur.videoTitle || 'Video Tutorial YouTube'}">
+                    </iframe>
+                  ` : `
+                    <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; text-align:center; color:#FFF; background:#0F172A;">
+                      <div style="font-size:2.5rem; margin-bottom:0.75rem;">🎥</div>
+                      <h4 style="color:#FFF; font-size:1.1rem; margin-bottom:0.5rem;">${cur.videoTitle || 'Video Tutorial Modul'}</h4>
+                      <p style="color:#94A3B8; max-width:480px; font-size:0.85rem; margin-bottom:1.25rem;">
+                        Tautan video terlampir: <code>${cur.videoUrl}</code>
+                      </p>
+                      <a href="${ytWatchUrl || cur.videoUrl}" target="_blank" rel="noopener" class="btn btn-primary" style="background:#DC2626; border-color:#DC2626; display:inline-flex; align-items:center; gap:0.4rem;">
+                        <span>▶ Putar Video di YouTube Tab Baru</span>
+                        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      </a>
+                    </div>
+                  `
+                )}
               </div>
 
               <div class="video-section-footer">
@@ -868,6 +943,7 @@ const App = {
     if (index >= 0 && index < modules.length) {
       NetLearnStore.state.activeMateriIndex = index;
       NetLearnStore.state.activeSlideIndex = 0; // reset slide ke slide awal
+      this.materiViewMode = 'ppt';
       if (!NetLearnStore.state.materiProgress) NetLearnStore.state.materiProgress = [];
       NetLearnStore.state.materiProgress[index] = true;
       NetLearnStore.save();
@@ -980,11 +1056,12 @@ const App = {
   },
 
   // Helper Pengubah Tautan YouTube Menjadi Format Embed Resmi (Universally Supported)
-  getYoutubeEmbedUrl(url) {
+  getYoutubeEmbedUrl(url, autoplay = false) {
     if (!url || typeof url !== 'string') return '';
     const videoId = this.extractYoutubeId(url);
     if (videoId) {
-      return `https://www.youtube.com/embed/${videoId}?rel=0`;
+      const ap = autoplay ? '&autoplay=1' : '';
+      return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1&enablejsapi=1${ap}`;
     }
     const trimmed = url.trim();
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
@@ -1002,7 +1079,7 @@ const App = {
     return url.trim();
   },
 
-  // Pratinjau Tautan Video YouTube Secara Real-Time pada Modal CMS
+  // Pratinjau Tautan Video YouTube / Berkas Lokal Secara Real-Time pada Modal CMS
   previewCMSVideoUrl() {
     const input = document.getElementById('cms-form-yt');
     const previewEl = document.getElementById('cms-yt-preview');
@@ -1011,6 +1088,20 @@ const App = {
     const val = input.value.trim();
     if (!val) {
       previewEl.innerHTML = '';
+      return;
+    }
+
+    const isNative = val.endsWith('.mp4') || val.endsWith('.webm') || val.startsWith('blob:') || val.startsWith('data:video/');
+    if (isNative) {
+      previewEl.innerHTML = `
+        <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:var(--radius-md); padding:0.6rem 0.85rem; font-size:0.78rem; color:#065F46; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; flex-wrap:wrap; margin-top:0.4rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <span>🎬</span>
+            <strong>Berkas Video Terpilih!</strong>
+            <span style="font-size:0.72rem; color:#047857;">(Format video didukung pemutar langsung web)</span>
+          </div>
+        </div>
+      `;
       return;
     }
 
@@ -1032,10 +1123,29 @@ const App = {
       previewEl.innerHTML = `
         <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:var(--radius-md); padding:0.6rem 0.85rem; font-size:0.78rem; color:#92400E; margin-top:0.4rem;">
           ⚠️ Format link YouTube belum dikenali. Contoh link yang didukung:
-          <br><code>https://www.youtube.com/watch?v=BWZ-MHIhqjA</code> atau <code>https://youtu.be/BWZ-MHIhqjA</code>
+          <br><code>https://www.youtube.com/watch?v=M11SvDtPBhA</code> atau <code>https://youtu.be/M11SvDtPBhA</code>
         </div>
       `;
     }
+  },
+
+  handleCMSVideoFileUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const objectUrl = URL.createObjectURL(file);
+    const ytInput = document.getElementById('cms-form-yt');
+    const titleInput = document.getElementById('cms-form-yt-title');
+    const statusEl = document.getElementById('cms-video-file-status');
+    if (ytInput) {
+      ytInput.value = objectUrl;
+    }
+    if (titleInput && !titleInput.value) {
+      titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+    }
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color:#059669; font-weight:600;">✓ Berkas dipilih: ${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)</span>`;
+    }
+    this.previewCMSVideoUrl();
   },
 
   // Helper Smooth Scroll ke Elemen Spesifik pada Layar Materi
@@ -1390,7 +1500,15 @@ Tuliskan contoh praktikum di sini...
           </div>
           <div class="form-group" style="margin-bottom:0.35rem;">
             <label class="form-label" style="font-size:0.76rem;">URL / Link Video YouTube:</label>
-            <input type="text" id="cms-form-yt" class="form-control" oninput="App.previewCMSVideoUrl()" placeholder="https://www.youtube.com/watch?v=BWZ-MHIhqjA atau https://youtu.be/...">
+            <input type="text" id="cms-form-yt" class="form-control" oninput="App.previewCMSVideoUrl()" placeholder="Contoh: https://www.youtube.com/watch?v=M11SvDtPBhA atau https://youtu.be/...">
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center; margin-top:0.4rem; flex-wrap:wrap;">
+            <label for="cms-form-video-file" class="btn btn-secondary btn-sm" style="cursor:pointer; display:inline-flex; align-items:center; gap:0.35rem; font-size:0.76rem;">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Pilih Berkas Video dari Komputer (.mp4 / .webm)</span>
+            </label>
+            <input type="file" id="cms-form-video-file" accept="video/mp4,video/webm" style="display:none;" onchange="App.handleCMSVideoFileUpload(event)">
+            <span id="cms-video-file-status" style="font-size:0.73rem; color:var(--color-text-muted);">atau tempel link YouTube di atas</span>
           </div>
           <div id="cms-yt-preview"></div>
         </div>
@@ -1489,7 +1607,15 @@ Tuliskan contoh praktikum di sini...
           </div>
           <div class="form-group" style="margin-bottom:0.35rem;">
             <label class="form-label" style="font-size:0.76rem;">URL / Link Video YouTube:</label>
-            <input type="text" id="cms-form-yt" class="form-control" value="${cur.videoUrl || ''}" oninput="App.previewCMSVideoUrl()" placeholder="https://www.youtube.com/watch?v=BWZ-MHIhqjA atau https://youtu.be/...">
+            <input type="text" id="cms-form-yt" class="form-control" value="${cur.videoUrl || ''}" oninput="App.previewCMSVideoUrl()" placeholder="Contoh: https://www.youtube.com/watch?v=M11SvDtPBhA atau https://youtu.be/...">
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center; margin-top:0.4rem; flex-wrap:wrap;">
+            <label for="cms-form-video-file" class="btn btn-secondary btn-sm" style="cursor:pointer; display:inline-flex; align-items:center; gap:0.35rem; font-size:0.76rem;">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Pilih Berkas Video dari Komputer (.mp4 / .webm)</span>
+            </label>
+            <input type="file" id="cms-form-video-file" accept="video/mp4,video/webm" style="display:none;" onchange="App.handleCMSVideoFileUpload(event)">
+            <span id="cms-video-file-status" style="font-size:0.73rem; color:var(--color-text-muted);">atau tempel link YouTube di atas</span>
           </div>
           <div id="cms-yt-preview"></div>
         </div>
@@ -1560,6 +1686,9 @@ Tuliskan contoh praktikum di sini...
     const targetIdx = (idx >= 0) ? idx : (NetLearnStore.getModules().length - 1);
     NetLearnStore.state.activeMateriIndex = targetIdx;
     NetLearnStore.state.activeSlideIndex = 0;
+    if (videoUrl) {
+      this.materiViewMode = 'video';
+    }
     NetLearnStore.save();
 
     this.renderGuruCMSMateri();
