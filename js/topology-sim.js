@@ -22,6 +22,7 @@ const TopologySim = {
   selectedDevice: null,
   connectingSource: null,
   isCableToolActive: false,
+  selectedCableType: 'auto', // 'auto', 'straight', 'cross', 'fiber' (Revisi Item 10)
   dragTarget: null,
   dragOffset: { x: 0, y: 0 },
   simSpeed: 1, // 0.5 (slow/edu), 1 (normal), 2 (fast)
@@ -245,20 +246,43 @@ const TopologySim = {
               <span style="color:#A855F7">📶</span> + Access Point (AP)
             </button>
 
-            <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--color-border);" />
+            <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid rgba(255,255,255,0.12);" />
 
-            <div class="palette-title">Alat Penghubung</div>
-            <button id="cable-tool-btn" class="btn btn-secondary btn-sm" style="width:100%; justify-content: flex-start;" onclick="TopologySim.toggleCableTool()">
+            <!-- Pilihan Jenis Kabel & Edukasi (Revisi Item 10) -->
+            <div class="palette-title">🔌 Jenis Kabel Jaringan</div>
+            <div class="cable-type-selector">
+              <button type="button" class="cable-type-btn active" id="cable-type-auto" onclick="TopologySim.selectCableType('auto')">
+                <span>⚡ Kabel Otomatis</span>
+                <span style="font-size:0.65rem; color:#34D399;">(Auto)</span>
+              </button>
+              <button type="button" class="cable-type-btn" id="cable-type-straight" onclick="TopologySim.selectCableType('straight')">
+                <span>━━ Straight-Through</span>
+                <span style="font-size:0.65rem; color:#38BDF8;">(UTP T568B)</span>
+              </button>
+              <button type="button" class="cable-type-btn" id="cable-type-cross" onclick="TopologySim.selectCableType('cross')">
+                <span>╍╍ Cross-Over</span>
+                <span style="font-size:0.65rem; color:#F59E0B;">(UTP Silang)</span>
+              </button>
+              <button type="button" class="cable-type-btn" id="cable-type-fiber" onclick="TopologySim.selectCableType('fiber')">
+                <span>🔶 Fiber Optik</span>
+                <span style="font-size:0.65rem; color:#FB923C;">(Backbone)</span>
+              </button>
+            </div>
+
+            <button id="cable-tool-btn" class="btn btn-primary btn-sm" style="width:100%; justify-content: center; font-weight:700; background:#2563EB; border-color:#2563EB; color:#FFF; margin-top:0.25rem;" onclick="TopologySim.toggleCableTool()">
               🔌 <span>Hubungkan Kabel</span>
             </button>
+            <button type="button" class="btn btn-secondary btn-sm" style="width:100%; justify-content: center; font-size:0.75rem; margin-top:0.35rem; background:#1E293B; color:#FFFFFF; border-color:#334155;" onclick="TopologySim.showCableEducationModal()">
+              📖 <span>Panduan &amp; Teori Kabel</span>
+            </button>
 
-            <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid var(--color-border);" />
+            <hr style="margin: 0.5rem 0; border: none; border-top: 1px solid rgba(255,255,255,0.12);" />
 
-            <div class="palette-title">Bantuan & Referensi</div>
-            <button class="btn btn-secondary btn-sm" style="width:100%; text-align:left; font-size:0.75rem;" onclick="TopologySim.validateStudentConfigurations()">
+            <div class="palette-title">Bantuan &amp; Referensi</div>
+            <button class="btn btn-secondary btn-sm" style="width:100%; text-align:left; font-size:0.75rem; background:#1E293B; color:#FFFFFF; border-color:#334155;" onclick="TopologySim.validateStudentConfigurations()">
               🔍 <span>Validasi Mandiri Siswa</span>
             </button>
-            <button class="btn btn-secondary btn-sm" style="width:100%; text-align:left; font-size:0.75rem; margin-top:0.35rem;" onclick="TopologySim.downloadPacketTracerGuide()">
+            <button class="btn btn-secondary btn-sm" style="width:100%; text-align:left; font-size:0.75rem; margin-top:0.35rem; background:#1E293B; color:#FFFFFF; border-color:#334155;" onclick="TopologySim.downloadPacketTracerGuide()">
               📥 <span>Unduh Panduan (.pkt)</span>
             </button>
           </div>
@@ -593,6 +617,106 @@ const TopologySim = {
     return device;
   },
 
+  // Pilihan Jenis Kabel Jaringan & Edukasi (Revisi Item 10)
+  selectCableType(type) {
+    this.selectedCableType = type;
+    document.querySelectorAll('.cable-type-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById(`cable-type-${type}`);
+    if (btn) btn.classList.add('active');
+    const names = {
+      auto: 'Kabel Otomatis (Auto-Detect)',
+      straight: 'Straight-Through (UTP T568B)',
+      cross: 'Cross-Over (UTP Silang)',
+      fiber: 'Fiber Optik (Backbone)'
+    };
+    this.logTerminal(`[KABEL] Tipe kabel aktif: ${names[type] || type}. Klik "Hubungkan Kabel" untuk memasang.`);
+  },
+
+  detectOptimalCableType(src, tgt) {
+    if (!src || !tgt) return 'straight';
+    const s = src.type;
+    const t = tgt.type;
+    if (s === 'server' || t === 'server') return 'fiber';
+    // Perangkat sejenis / selevel menggunakan Cross-Over
+    if (s === t) return 'cross';
+    if ((s === 'pc' || s === 'laptop') && t === 'router') return 'cross';
+    if (s === 'router' && (t === 'pc' || t === 'laptop')) return 'cross';
+    // Perangkat berbeda melalui Switch menggunakan Straight-Through
+    return 'straight';
+  },
+
+  showCableEducationModal() {
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalFooter = document.getElementById('modal-footer');
+
+    modalTitle.innerHTML = '🔌 Panduan &amp; Edukasi Jenis Kabel Jaringan';
+    modalBody.innerHTML = `
+      <div style="font-size:0.9rem; line-height:1.6; color:#0F172A;">
+        <p style="margin-bottom:1rem; color:#475569;">
+          Dalam kurikulum <strong>Teknik Komputer &amp; Jaringan (TKJ SMK)</strong>, pemilihan media transmisi fisik kabel jaringan ditentukan oleh jenis perangkat yang saling dihubungkan dan kebutuhan lebar pita (*bandwidth*):
+        </p>
+
+        <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:1.25rem;">
+          
+          <!-- Straight Through -->
+          <div style="border:1.5px solid #38BDF8; border-radius:8px; padding:12px 14px; background:#F0F9FF;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+              <strong style="color:#0369A1; font-size:0.95rem;">1. Kabel Straight-Through (UTP T568B)</strong>
+              <span class="badge badge-blue">Garis Biru Solid</span>
+            </div>
+            <div style="font-size:0.83rem; color:#334155; margin-bottom:6px;">
+              <strong>Fungsi:</strong> Menghubungkan <strong>dua perangkat yang BERBEDA level/fungsi</strong> dalam hierarki jaringan.
+            </div>
+            <ul style="margin:0; padding-left:18px; font-size:0.82rem; color:#475569;">
+              <li>Komputer (PC / Laptop) ke Switch</li>
+              <li>Router ke Switch</li>
+              <li>Access Point ke Switch</li>
+            </ul>
+            <div style="font-size:0.75rem; color:#0284C7; margin-top:6px; font-family:monospace;">
+              Standar T568B: Putih-Orange, Orange, Putih-Hijau, Biru, Putih-Biru, Hijau, Putih-Cokelat, Cokelat (Kedua Ujung Sama).
+            </div>
+          </div>
+
+          <!-- Cross Over -->
+          <div style="border:1.5px solid #F59E0B; border-radius:8px; padding:12px 14px; background:#FFFBEB;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+              <strong style="color:#B45309; font-size:0.95rem;">2. Kabel Cross-Over (T568A ke T568B)</strong>
+              <span class="badge badge-warning">Garis Oranye Putus-Putus</span>
+            </div>
+            <div style="font-size:0.83rem; color:#334155; margin-bottom:6px;">
+              <strong>Fungsi:</strong> Menghubungkan <strong>dua perangkat yang SEJENIS / SELEVEL</strong> secara langsung tanpa switch perantara.
+            </div>
+            <ul style="margin:0; padding-left:18px; font-size:0.82rem; color:#475569;">
+              <li>PC langsung ke PC (Peer-to-Peer)</li>
+              <li>Switch ke Switch (Uplink / Trunking)</li>
+              <li>Router langsung ke PC (keduanya memiliki layer transmisi serupa)</li>
+              <li>Router ke Router (Koneksi Point-to-Point)</li>
+            </ul>
+          </div>
+
+          <!-- Fiber Optic -->
+          <div style="border:1.5px solid #FB923C; border-radius:8px; padding:12px 14px; background:#FFF7ED;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+              <strong style="color:#C2410C; font-size:0.95rem;">3. Kabel Fiber Optik (Serat Optik)</strong>
+              <span class="badge" style="background:#FED7AA; color:#9A3412;">Garis Oranye Cahaya</span>
+            </div>
+            <div style="font-size:0.83rem; color:#334155; margin-bottom:6px;">
+              <strong>Fungsi:</strong> Jalur utama (*backbone*) berkecepatan multi-gigabit hingga terabit bebas induksi elektromagnetik (EMI) untuk jarak jauh antar-gedung atau ke Server/Datacenter.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    `;
+
+    modalFooter.innerHTML = `
+      <button class="btn btn-primary" onclick="closeModal()">Paham &amp; Kembali ke Simulator</button>
+    `;
+
+    openModal();
+  },
+
   toggleCableTool() {
     this.isCableToolActive = !this.isCableToolActive;
     const btn = document.getElementById('cable-tool-btn');
@@ -645,13 +769,19 @@ const TopologySim = {
           if (exists) {
             this.logTerminal(`[KABEL] Kedua alat sudah terhubung kabel sebelumnya.`);
           } else {
+            const cableType = (this.selectedCableType === 'auto')
+              ? this.detectOptimalCableType(this.connectingSource, device)
+              : this.selectedCableType;
+
             this.links.push({
               id: 'link_' + Date.now(),
               sourceId: this.connectingSource.id,
               targetId: device.id,
+              cableType: cableType,
               status: 'UP'
             });
-            this.logTerminal(`[KABEL] Sukses memasang kabel antara '${this.connectingSource.name}' dan '${device.name}'.`);
+            const typeLabel = cableType === 'straight' ? 'Straight-Through' : (cableType === 'cross' ? 'Cross-Over' : 'Fiber Optik');
+            this.logTerminal(`[KABEL] Sukses memasang kabel ${typeLabel} antara '${this.connectingSource.name}' dan '${device.name}'.`);
           }
           this.connectingSource = null;
           this.toggleCableTool();
@@ -691,7 +821,7 @@ const TopologySim = {
     // 1. Render Subnet Clustering Zones
     this.renderSubnetZones();
 
-    // 2. Render Cable Links
+    // 2. Render Cable Links (Revisi Item 10: Tipe & Gaya Kabel Jaringan)
     let linksHtml = '';
     for (const link of this.links) {
       const src = this.devices.find(d => d.id === link.sourceId);
@@ -702,9 +832,10 @@ const TopologySim = {
       const y1 = src.y + 44;
       const x2 = tgt.x + 44;
       const y2 = tgt.y + 44;
+      const cType = link.cableType || 'straight';
 
       linksHtml += `
-        <line id="${link.id}" class="cable-line" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />
+        <line id="${link.id}" class="cable-line cable-${cType}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />
         <circle cx="${x1}" cy="${y1}" r="4.5" fill="#10B981" filter="drop-shadow(0 0 3px #10B981)" />
         <circle cx="${x2}" cy="${y2}" r="4.5" fill="#10B981" filter="drop-shadow(0 0 3px #10B981)" />
       `;

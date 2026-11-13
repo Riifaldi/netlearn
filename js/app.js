@@ -15,10 +15,64 @@ const App = {
   },
 
   bindEvents() {
-    // Keyboard shortcuts & window events
+    // Keyboard shortcuts & window events (Revisi Item 5: ESC support & PPT Arrow navigation)
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        closeModal();
+        if (document.fullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+        }
+        const preview = document.getElementById('sidebar-preview-content');
+        if (preview && preview.classList.contains('open')) {
+          App.toggleSidebarPreview();
+        }
+      }
+      // Navigasi Slide PPT Menggunakan Panah Kanan / Kiri (Revisi Item 8)
+      if (NetLearnStore.state.activeScreen === 'materi') {
+        if (e.key === 'ArrowRight') App.nextMateriSlide();
+        if (e.key === 'ArrowLeft') App.prevMateriSlide();
+      }
     });
+  },
+
+  // Toggle Dropdown Laman Preview pada Sidebar Guru (Revisi Item 3)
+  toggleSidebarPreview() {
+    const btn = document.getElementById('sidebar-preview-toggle');
+    const content = document.getElementById('sidebar-preview-content');
+    if (btn && content) {
+      const isOpen = content.classList.contains('open');
+      if (isOpen) {
+        content.classList.remove('open');
+        btn.classList.remove('open');
+      } else {
+        content.classList.add('open');
+        btn.classList.add('open');
+      }
+    }
+  },
+
+  // Dialog Konfirmasi Aman Reset Data (Revisi Item 1: Proteksi Tanda Jelas)
+  confirmResetSession() {
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalFooter = document.getElementById('modal-footer');
+
+    modalTitle.innerHTML = '⚠️ Konfirmasi Reset Sesi Belajar';
+    modalBody.innerHTML = `
+      <div class="callout callout-important" style="margin-bottom:1rem; border-left:4px solid #DC2626;">
+        <strong>Peringatan Proteksi Data:</strong> Tindakan ini akan mengosongkan progres belajar, riwayat simulasi, dan skor latihan lokal pada peramban ini kembali ke status bawaan.
+      </div>
+      <p style="font-size:0.92rem; color:var(--color-text-main); line-height:1.5;">
+        Apakah Anda benar-benar yakin ingin melanjutkan reset sesi belajar?
+      </p>
+    `;
+
+    modalFooter.innerHTML = `
+      <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn btn-danger" style="background:#DC2626; border-color:#DC2626; color:#FFF;" onclick="closeModal(); NetLearnStore.resetAll();">Ya, Reset Sesi Sekarang</button>
+    `;
+
+    openModal();
   },
 
   // =========================================================================
@@ -290,15 +344,20 @@ const App = {
       }
     }
 
-    // Toggle teacher nav items in sidebar
+    // Toggle teacher nav items in sidebar (Revisi Item 3: Panel Guru di atas, Siswa di bawah/dropdown)
     const guruNavSection = document.getElementById('sidebar-guru-section');
     if (guruNavSection) {
       guruNavSection.style.display = isGuru ? 'block' : 'none';
     }
 
+    const siswaNavSection = document.getElementById('sidebar-siswa-section');
+    if (siswaNavSection) {
+      siswaNavSection.style.display = isGuru ? 'none' : 'block';
+    }
+
     const roleSidebarTitle = document.getElementById('role-sidebar-title');
     const roleSidebarDesc = document.getElementById('role-sidebar-desc');
-    if (roleSidebarTitle) roleSidebarTitle.textContent = isGuru ? 'Mode Guru' : 'Mode Siswa';
+    if (roleSidebarTitle) roleSidebarTitle.textContent = isGuru ? 'Portal Guru' : 'Mode Siswa';
     if (roleSidebarDesc) roleSidebarDesc.textContent = user.name || (isGuru ? 'Guru Pengampu' : 'Peserta Didik');
   },
 
@@ -397,7 +456,7 @@ const App = {
   updateHeaderTitles(screenId) {
     const screenMeta = {
       'beranda': { title: 'Beranda Pembelajaran', breadcrumb: 'Beranda' },
-      'tujuan': { title: 'Capaian & Tujuan Belajar (CP / TP)', breadcrumb: 'Tujuan Belajar' },
+      'tujuan': { title: 'Capaian & Tujuan Pembelajaran (CP / TP)', breadcrumb: 'Tujuan Pembelajaran' },
       'materi': { title: 'Materi Interaktif Perencanaan Jaringan', breadcrumb: 'Materi Interaktif' },
       'simulasi': { title: 'Simulasi Pengalamatan & Topologi', breadcrumb: 'Simulasi' },
       'latihan': { title: 'Latihan Soal Bertahap (10 Butir)', breadcrumb: 'Latihan Soal' },
@@ -753,13 +812,13 @@ const App = {
                       `}
                     </div>
 
-                    <!-- Controls Navigasi Slide -->
+                    <!-- Controls Navigasi Slide (Revisi Item 8: Tombol Navigasi Berfungsi Lancar & Presisi) -->
                     <div class="slide-deck-controls">
-                      <button class="slide-nav-btn" onclick="App.prevMateriSlide()" ${(slides.length <= 1 || slideIdx === 0) ? 'disabled' : ''}>
+                      <button id="slide-prev-btn" class="slide-nav-btn" onclick="App.prevMateriSlide()" ${(slides.length <= 1 || slideIdx === 0) ? 'disabled' : ''}>
                         ◀ Slide Sebelumnya
                       </button>
 
-                      <div class="slide-dots-container">
+                      <div class="slide-dots-container" id="slide-dots-container-el">
                         ${slides.map((_, i) => `
                           <button class="slide-dot ${i === slideIdx ? 'active' : ''}" 
                                   onclick="App.setMateriSlide(${i})" 
@@ -767,7 +826,7 @@ const App = {
                         `).join('')}
                       </div>
 
-                      <button class="slide-nav-btn" onclick="App.nextMateriSlide()" ${(slides.length <= 1 || slideIdx === slides.length - 1) ? 'disabled' : ''}>
+                      <button id="slide-next-btn" class="slide-nav-btn" onclick="App.nextMateriSlide()" ${(slides.length <= 1 || slideIdx === slides.length - 1) ? 'disabled' : ''}>
                         Slide Selanjutnya ▶
                       </button>
                     </div>
@@ -929,29 +988,102 @@ const App = {
     }
   },
 
-  // Slide Deck Navigation Helpers
+  // Slide Deck Navigation Helpers (Revisi Item 8: Transisi Mulus & Presisi Tanpa Loncat Layar)
   nextMateriSlide() {
     const modules = NetLearnStore.getModules();
     const cur = modules[NetLearnStore.state.activeMateriIndex || 0];
-    const slides = (cur && cur.pptSlides) ? cur.pptSlides : [];
+    let slides = (cur && cur.pptSlides) ? cur.pptSlides : [];
+    if (typeof slides === 'string') {
+      try { slides = JSON.parse(slides); } catch (e) { slides = []; }
+    }
     const curSlide = NetLearnStore.state.activeSlideIndex || 0;
     if (curSlide < slides.length - 1) {
       NetLearnStore.state.activeSlideIndex = curSlide + 1;
-      this.renderMateri();
+      NetLearnStore.save();
+      this.updateSlideDeckDOM(slides, curSlide + 1);
     }
   },
 
   prevMateriSlide() {
+    const modules = NetLearnStore.getModules();
+    const cur = modules[NetLearnStore.state.activeMateriIndex || 0];
+    let slides = (cur && cur.pptSlides) ? cur.pptSlides : [];
+    if (typeof slides === 'string') {
+      try { slides = JSON.parse(slides); } catch (e) { slides = []; }
+    }
     const curSlide = NetLearnStore.state.activeSlideIndex || 0;
     if (curSlide > 0) {
       NetLearnStore.state.activeSlideIndex = curSlide - 1;
-      this.renderMateri();
+      NetLearnStore.save();
+      this.updateSlideDeckDOM(slides, curSlide - 1);
     }
   },
 
   setMateriSlide(slideIdx) {
-    NetLearnStore.state.activeSlideIndex = slideIdx;
-    this.renderMateri();
+    const modules = NetLearnStore.getModules();
+    const cur = modules[NetLearnStore.state.activeMateriIndex || 0];
+    let slides = (cur && cur.pptSlides) ? cur.pptSlides : [];
+    if (typeof slides === 'string') {
+      try { slides = JSON.parse(slides); } catch (e) { slides = []; }
+    }
+    if (slideIdx >= 0 && slideIdx < slides.length) {
+      NetLearnStore.state.activeSlideIndex = slideIdx;
+      NetLearnStore.save();
+      this.updateSlideDeckDOM(slides, slideIdx);
+    }
+  },
+
+  updateSlideDeckDOM(slides, slideIdx) {
+    if (!slides || slides.length === 0) return;
+    const curSlide = slides[slideIdx];
+    if (!curSlide) return;
+
+    // Update Counter Badge
+    const counterBadge = document.querySelector('.slide-counter-badge');
+    if (counterBadge) counterBadge.textContent = `Slide ${slideIdx + 1} dari ${slides.length}`;
+
+    // Update Content with smooth fade
+    const contentEl = document.querySelector('.slide-deck-content');
+    if (contentEl) {
+      contentEl.style.opacity = '0.3';
+      contentEl.style.transition = 'opacity 0.15s ease';
+      setTimeout(() => {
+        contentEl.innerHTML = `
+          <h3 class="slide-main-title">${curSlide.title}</h3>
+          <div class="slide-subtitle">${curSlide.subtitle || ''}</div>
+          <ul class="slide-bullets-list">
+            ${(curSlide.bullets || []).map(b => `
+              <li class="slide-bullet-item">
+                <span class="check-icon">✓</span>
+                <span>${b}</span>
+              </li>
+            `).join('')}
+          </ul>
+          ${curSlide.highlight ? `
+            <div class="slide-highlight-box">
+              ${curSlide.highlight}
+            </div>
+          ` : ''}
+        `;
+        contentEl.style.opacity = '1';
+      }, 100);
+    } else {
+      this.renderMateri();
+      return;
+    }
+
+    // Update Navigation Buttons Disabled State
+    const prevBtn = document.getElementById('slide-prev-btn');
+    const nextBtn = document.getElementById('slide-next-btn');
+    if (prevBtn) prevBtn.disabled = (slideIdx === 0);
+    if (nextBtn) nextBtn.disabled = (slideIdx === slides.length - 1);
+
+    // Update Dots Container
+    const dots = document.querySelectorAll('#slide-dots-container-el .slide-dot');
+    dots.forEach((dot, i) => {
+      if (i === slideIdx) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
   },
 
   togglePPTFullscreen() {
@@ -1446,7 +1578,7 @@ const App = {
                     Sunting
                   </button>
                   <button class="btn btn-secondary btn-sm" onclick="App.openModule(${idx}); App.navigateTo('materi');" title="Buka dan Pratinjau Modul Ini Langsung di Layar Materi">
-                    Lihat di Materi
+                    Lihat Modul
                   </button>
                   <button class="btn btn-secondary btn-sm" style="color:var(--color-danger);" onclick="App.deleteCMSModule(${idx})" title="Hapus Modul">
                     Hapus
@@ -3129,6 +3261,169 @@ Tuliskan contoh praktikum di sini...
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast('Laporan database siswa format CSV berhasil diunduh!', 'success');
+  },
+
+  // Ekspor Rekapitulasi Capaian Nilai Siswa ke Format PDF Siap Cetak (Revisi Item 14)
+  exportClassReportPDF() {
+    const students = NetLearnStore.state.studentRecords || [];
+    const teacher = NetLearnStore.state.teacherUser || { name: 'Bpk. Rifaldi, S.Pd., M.T.', nip: '198504122010011008' };
+    const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    let tuntasCount = 0;
+    let remedialCount = 0;
+    let totalScore = 0;
+    let evaluatedCount = 0;
+
+    students.forEach(s => {
+      const score = Number(s.evaluasiScore) || 0;
+      if (s.status === 'Tuntas' || score >= 75) {
+        tuntasCount++;
+        evaluatedCount++;
+        totalScore += score;
+      } else if (s.status === 'Remedial' || score > 0) {
+        remedialCount++;
+        evaluatedCount++;
+        totalScore += score;
+      }
+    });
+
+    const avgScore = evaluatedCount > 0 ? Math.round(totalScore / evaluatedCount) : 0;
+    const tuntasPercent = evaluatedCount > 0 ? Math.round((tuntasCount / evaluatedCount) * 100) : 0;
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      alert('Pop-up jendela cetak terblokir oleh peramban. Izinkan pop-up untuk mencetak / menyimpan dokumen PDF.');
+      return;
+    }
+
+    const rowsHtml = students.map((s, idx) => `
+      <tr>
+        <td style="text-align:center; padding:7px 8px; border:1px solid #CBD5E1;">${idx + 1}</td>
+        <td style="padding:7px 8px; border:1px solid #CBD5E1; font-weight:600;">${s.name}</td>
+        <td style="text-align:center; padding:7px 8px; border:1px solid #CBD5E1; font-family:monospace;">${s.nis}</td>
+        <td style="text-align:center; padding:7px 8px; border:1px solid #CBD5E1;">${s.kelas || 'XI TKJ 1'}</td>
+        <td style="text-align:center; padding:7px 8px; border:1px solid #CBD5E1; font-weight:600;">${s.latihanScore || 0}</td>
+        <td style="text-align:center; padding:7px 8px; border:1px solid #CBD5E1; font-weight:700; color:${(s.evaluasiScore || 0) >= 75 ? '#15803D' : '#B91C1C'};">${s.evaluasiScore || 0}</td>
+        <td style="text-align:center; padding:7px 8px; border:1px solid #CBD5E1; font-weight:700;">
+          <span style="display:inline-block; padding:3px 8px; border-radius:4px; font-size:11px; background:${(s.evaluasiScore || 0) >= 75 ? '#DCFCE7' : ((s.evaluasiScore || 0) > 0 ? '#FEE2E2' : '#F1F5F9')}; color:${(s.evaluasiScore || 0) >= 75 ? '#166534' : ((s.evaluasiScore || 0) > 0 ? '#991B1B' : '#475569')};">
+            ${(s.evaluasiScore || 0) >= 75 ? 'TUNTAS' : ((s.evaluasiScore || 0) > 0 ? 'REMEDIAL' : 'BELUM UJIAN')}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <title>Rekapitulasi_Nilai_NetLearn_SMKN3_Makassar_${new Date().toISOString().slice(0, 10)}</title>
+        <style>
+          @page { size: A4 portrait; margin: 15mm 15mm 15mm 15mm; }
+          body { font-family: 'Segoe UI', Arial, sans-serif; color: #0F172A; margin: 0; padding: 20px; font-size: 12px; }
+          .kop-surat { text-align: center; border-bottom: 3px double #000; padding-bottom: 12px; margin-bottom: 20px; }
+          .kop-surat h4 { margin: 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+          .kop-surat h2 { margin: 3px 0; font-size: 16px; font-weight: 800; text-transform: uppercase; }
+          .kop-surat p { margin: 2px 0; font-size: 11px; color: #334155; }
+          .doc-title { text-align: center; margin-bottom: 16px; }
+          .doc-title h3 { margin: 0; font-size: 14px; text-decoration: underline; font-weight: 800; }
+          .doc-title span { font-size: 11px; color: #475569; }
+          .summary-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+          .card { border: 1px solid #CBD5E1; border-radius: 6px; padding: 8px 12px; text-align: center; background: #F8FAFC; }
+          .card .val { font-size: 16px; font-weight: 800; color: #1E293B; margin-top: 2px; }
+          .card .lbl { font-size: 10px; color: #64748B; text-transform: uppercase; font-weight: 600; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+          th { background: #1E293B; color: #FFF; padding: 8px; border: 1px solid #1E293B; font-size: 11px; text-align: center; }
+          .signature-section { display: flex; justify-content: space-between; margin-top: 30px; font-size: 11px; page-break-inside: avoid; }
+          .sign-col { text-align: center; width: 220px; }
+          .sign-space { height: 60px; }
+          @media print {
+            .no-print { display: none !important; }
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="no-print" style="margin-bottom: 15px; padding: 10px 15px; background: #EFF6FF; border: 1px solid #3B82F6; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-weight: 600; color: #1D4ED8;">Pratinjau Dokumen PDF Rekapitulasi Nilai Siswa</span>
+          <div>
+            <button onclick="window.print()" style="background: #2563EB; color: #FFF; border: none; padding: 6px 14px; border-radius: 4px; font-weight: 700; cursor: pointer;">Cetak / Simpan PDF (Ctrl+P)</button>
+            <button onclick="window.close()" style="background: #E2E8F0; color: #334155; border: none; padding: 6px 14px; border-radius: 4px; font-weight: 600; cursor: pointer; margin-left: 6px;">Tutup</button>
+          </div>
+        </div>
+
+        <div class="kop-surat">
+          <h4>Pemerintah Provinsi Sulawesi Selatan • Dinas Pendidikan</h4>
+          <h2>SMK NEGERI 3 MAKASSAR</h2>
+          <p>Program Keahlian: Teknik Jaringan Komputer & Telekomunikasi (TJKT)</p>
+          <p>Alamat: Jl. Bonto Te'ne No. 22, Kota Makassar, Sulawesi Selatan</p>
+        </div>
+
+        <div class="doc-title">
+          <h3>REKAPITULASI CAPAIAN NILAI & KETUNTASAN SISWA</h3>
+          <span>Mata Pelajaran: Perencanaan & Pengalamatan Jaringan (Fase F - Kurikulum Merdeka)</span>
+        </div>
+
+        <div class="summary-cards">
+          <div class="card">
+            <div class="lbl">Total Siswa</div>
+            <div class="val">${students.length} Orang</div>
+          </div>
+          <div class="card">
+            <div class="lbl">Tuntas KKM (≥75)</div>
+            <div class="val" style="color:#15803D;">${tuntasCount} Siswa (${tuntasPercent}%)</div>
+          </div>
+          <div class="card">
+            <div class="lbl">Remedial (<75)</div>
+            <div class="val" style="color:#B91C1C;">${remedialCount} Siswa</div>
+          </div>
+          <div class="card">
+            <div class="lbl">Rata-Rata Nilai</div>
+            <div class="val" style="color:#2563EB;">${avgScore} / 100</div>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:35px;">No.</th>
+              <th>Nama Lengkap Siswa</th>
+              <th style="width:110px;">NIS</th>
+              <th style="width:80px;">Kelas</th>
+              <th style="width:90px;">Latihan</th>
+              <th style="width:90px;">Evaluasi</th>
+              <th style="width:110px;">Status KKM</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="signature-section">
+          <div class="sign-col">
+            <p>Mengetahui,<br>Kepala SMK Negeri 3 Makassar</p>
+            <div class="sign-space"></div>
+            <p><strong>Drs. H. Muhammad Ridwan, M.Pd.</strong><br>NIP. 19681120 199403 1 004</p>
+          </div>
+          <div class="sign-col">
+            <p>Makassar, ${today}<br>Guru Pengampu Mata Pelajaran</p>
+            <div class="sign-space"></div>
+            <p><strong>${teacher.name || 'Bpk. Rifaldi, S.Pd., M.T.'}</strong><br>NIP. ${teacher.nip || '198504122010011008'}</p>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
   },
 
   renderGuruRefleksi() {

@@ -341,70 +341,17 @@
             <div id="role-sidebar-desc" class="role-desc">Peserta Didik</div>
           </div>
         </div>
-        <button id="role-switch-sidebar-btn" class="role-switch-btn" style="display: none;" onclick="App.switchRole(NetLearnStore.state.currentRole === 'siswa' ? 'guru' : 'siswa')">
-          Ganti Peran
-        </button>
       </div>
 
       <!-- Navigation Links Container -->
       <div class="sidebar-nav-container">
         
-        <!-- Siswa Navigation Section -->
-        <div class="nav-section-label">Alur Belajar Siswa</div>
-        <ul class="nav-list">
-          <li>
-            <button class="nav-item-btn active" data-screen="beranda" onclick="App.navigateTo('beranda')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H4a1 1 0 0 1-1-1V9.5z"/></svg></span>
-              <span>1. Beranda</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="tujuan" onclick="App.navigateTo('tujuan')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
-              <span>2. Tujuan Belajar</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="materi" onclick="App.navigateTo('materi')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-              <span>3. Materi Interaktif</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="simulasi" onclick="App.navigateTo('simulasi')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg></span>
-              <span>4. Simulasi Jaringan</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="latihan" onclick="App.navigateTo('latihan')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
-              <span>5. Latihan Soal</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="evaluasi" onclick="App.navigateTo('evaluasi')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></span>
-              <span>6. Evaluasi Akhir</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="hasil" onclick="App.navigateTo('hasil')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
-              <span>7. Hasil Belajar</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-item-btn" data-screen="refleksi" onclick="App.navigateTo('refleksi')">
-              <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-              <span>8. Refleksi Belajar</span>
-            </button>
-          </li>
-        </ul>
-
-        <!-- Guru / Admin Exclusive Navigation Section -->
-        <div id="sidebar-guru-section" style="display: none; margin-top: 1rem;">
-          <div class="nav-section-label" style="color: #A78BFA;">Panel Guru (CMS & Data)</div>
+        <!-- Guru / Admin Exclusive Navigation Section (Revisi Item 3: Ditempatkan di Atas untuk Guru) -->
+        <div id="sidebar-guru-section" style="display: none; margin-bottom: 0.75rem;">
+          <div class="nav-section-label" style="color: #A78BFA; display:flex; align-items:center; gap:0.4rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <span>Panel Guru (CMS &amp; Data)</span>
+          </div>
           <ul class="nav-list">
             <li>
               <button class="nav-item-btn" data-screen="guru-dashboard" onclick="App.navigateTo('guru-dashboard')">
@@ -421,7 +368,7 @@
             <li>
               <button class="nav-item-btn" data-screen="guru-bank-soal" onclick="App.navigateTo('guru-bank-soal')">
                 <span class="nav-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span>
-                <span>Bank Soal & Ujian</span>
+                <span>Bank Soal &amp; Ujian</span>
               </button>
             </li>
             <li>
@@ -443,7 +390,127 @@
               </button>
             </li>
           </ul>
+
+          <!-- Laman Preview Dropdown (Revisi Item 3: Khusus Tampilan Guru) -->
+          <div class="sidebar-preview-dropdown-wrap">
+            <button type="button" class="sidebar-preview-toggle-btn" id="sidebar-preview-toggle" onclick="App.toggleSidebarPreview()">
+              <span style="display:flex; align-items:center; gap:0.45rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <span>Laman Preview (Layar Siswa)</span>
+              </span>
+              <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div id="sidebar-preview-content" class="sidebar-preview-container">
+              <ul class="nav-list" style="margin-top:0.4rem;">
+                <li>
+                  <button class="nav-item-btn" data-screen="beranda" onclick="App.navigateTo('beranda')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H4a1 1 0 0 1-1-1V9.5z"/></svg></span>
+                    <span>1. Beranda Siswa</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="tujuan" onclick="App.navigateTo('tujuan')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+                    <span>2. Tujuan Pembelajaran</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="materi" onclick="App.navigateTo('materi')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                    <span>3. Materi Interaktif</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="simulasi" onclick="App.navigateTo('simulasi')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg></span>
+                    <span>4. Simulasi Jaringan</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="latihan" onclick="App.navigateTo('latihan')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+                    <span>5. Latihan Soal</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="evaluasi" onclick="App.navigateTo('evaluasi')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></span>
+                    <span>6. Evaluasi Akhir</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="hasil" onclick="App.navigateTo('hasil')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
+                    <span>7. Hasil Belajar</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item-btn" data-screen="refleksi" onclick="App.navigateTo('refleksi')">
+                    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                    <span>8. Refleksi Belajar</span>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
+        
+        <!-- Siswa Navigation Section (Aktif Otomatis saat Akun Siswa Masuk) -->
+        <div id="sidebar-siswa-section">
+          <div class="nav-section-label">Alur Belajar Siswa</div>
+          <ul class="nav-list">
+            <li>
+              <button class="nav-item-btn active" data-screen="beranda" onclick="App.navigateTo('beranda')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H4a1 1 0 0 1-1-1V9.5z"/></svg></span>
+                <span>1. Beranda</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="tujuan" onclick="App.navigateTo('tujuan')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+                <span>2. Tujuan Pembelajaran</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="materi" onclick="App.navigateTo('materi')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+                <span>3. Materi Interaktif</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="simulasi" onclick="App.navigateTo('simulasi')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg></span>
+                <span>4. Simulasi Jaringan</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="latihan" onclick="App.navigateTo('latihan')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+                <span>5. Latihan Soal</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="evaluasi" onclick="App.navigateTo('evaluasi')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg></span>
+                <span>6. Evaluasi Akhir</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="hasil" onclick="App.navigateTo('hasil')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg></span>
+                <span>7. Hasil Belajar</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item-btn" data-screen="refleksi" onclick="App.navigateTo('refleksi')">
+                <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                <span>8. Refleksi Belajar</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+      </div>
 
       </div>
 
@@ -513,9 +580,10 @@
             <span>Keluar</span>
           </button>
 
-          <!-- Quick Actions & Reset Button -->
-          <button class="header-action-btn" title="Reset Ulang Data Sesi Belajar" onclick="if(confirm('Reset semua data progres dan kembali ke awal?')) NetLearnStore.resetAll();">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <!-- Tombol Reset Sesi dengan Proteksi Tanda Jelas & Dialog Konfirmasi (Revisi Item 1) -->
+          <button class="header-reset-btn" onclick="App.confirmResetSession()" title="Reset ulang sesi belajar (Diberi tanda peringatan agar tidak gampang tertekan)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Reset Data</span>
           </button>
         </div>
       </header>
@@ -577,7 +645,7 @@
               <div class="quick-card-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
               <h4 class="quick-card-title">1. Materi Interaktif</h4>
               <p class="quick-card-desc">Pelajari 7 modul terstruktur: Pengalamatan, Biner, IP, Subnet Mask, CIDR, Subnetting, dan VLSM.</p>
-              <div class="quick-card-link">Baca Materi →</div>
+              <div class="quick-card-link">Lihat Modul →</div>
             </div>
 
             <div class="quick-card" style="--card-color: #0284C7; --card-bg-light: #E0F2FE;" onclick="App.navigateTo('simulasi')">
@@ -1064,8 +1132,8 @@
               <button class="btn btn-secondary btn-sm" onclick="App.printHasilReport()">
                 <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px;"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Cetak Transkrip Nilai
               </button>
-              <button class="btn btn-secondary btn-sm" onclick="App.renderHasil(); showToast('Data hasil belajar disinkronkan kembali!', 'info');">
-                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>Segarkan Data
+              <button class="btn btn-secondary btn-sm" onclick="App.renderHasil(); showToast('Data hasil belajar berhasil disinkronkan!', 'success');">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:5px;"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>Sinkronkan Data
               </button>
             </div>
           </div>
@@ -1317,6 +1385,15 @@
 
         <!-- Guru Screen 4: Laporan Hasil Belajar Kelas & Database Siswa -->
         <section id="screen-guru-laporan" class="screen-view">
+          
+          <!-- Pemberitahuan Akses Perangkat Komputer/Laptop (Revisi Item 11) -->
+          <div class="report-desktop-notice">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            <div>
+              <strong>Informasi Akses Sistem:</strong> Halaman <strong>Laporan Nilai Kelas &amp; Rekapitulasi Siswa</strong> ini dirancang optimal untuk dibuka dan diakses melalui perangkat <strong>Komputer / Laptop (Desktop/PC)</strong> agar tabel transkrip nilai, indikator ketuntasan KKM 75, serta pencetakan dokumen PDF dapat ditampilkan secara penuh dan presisi.
+            </div>
+          </div>
+
           <div class="card" style="padding:1.75rem;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
               <div>
@@ -1331,6 +1408,11 @@
                 <button class="btn btn-success" onclick="App.exportClassReportCSV()" style="display:inline-flex; align-items:center; gap:0.4rem;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                   <span>Ekspor CSV / Excel</span>
+                </button>
+                <!-- Tombol Jadikan File PDF (Revisi Item 14) -->
+                <button class="btn btn-secondary" onclick="App.exportClassReportPDF()" style="display:inline-flex; align-items:center; gap:0.4rem; background:#DC2626; color:#FFF; border-color:#DC2626;" title="Cetak / Unduh Format Dokumen Resmi PDF">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  <span>Cetak / Simpan PDF</span>
                 </button>
               </div>
             </div>

@@ -662,14 +662,14 @@ textarea.form-control {
 }
 
 /* ============================================================
-   Modal
+   Modal (Revisi: Latar luar dibuat bersih/terang tanpa gelap pekat)
    ============================================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10,15,30,0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.08); /* Latar bersih tanpa gelap pekat */
+  backdrop-filter: none; /* Hilangkan efek blur gelap luar */
+  -webkit-backdrop-filter: none;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -677,7 +677,7 @@ textarea.form-control {
   padding: 1.5rem;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-overlay.open {
@@ -692,9 +692,10 @@ textarea.form-control {
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: var(--shadow-xl);
-  transform: translateY(20px) scale(0.96);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  transform: translateY(16px) scale(0.97);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   will-change: transform, opacity;
 }
 
@@ -757,6 +758,167 @@ textarea.form-control {
   align-items: center;
   justify-content: flex-end;
   gap: 0.65rem;
+}
+
+/* ============================================================
+   Header Reset Button (Revisi Item 1: Tanda Jelas agar Tidak Gampang Terreset)
+   ============================================================ */
+.header-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1.5px solid rgba(220, 38, 38, 0.4);
+  color: #DC2626;
+  border-radius: var(--radius-md);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-reset-btn:hover {
+  background: #DC2626;
+  color: #FFF;
+  border-color: #DC2626;
+  box-shadow: 0 2px 10px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   Sidebar Portal Guru - Laman Preview Dropdown (Revisi Item 3)
+   ============================================================ */
+.sidebar-preview-dropdown-wrap {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-preview-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: rgba(79, 110, 247, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: var(--radius-md);
+  color: #93C5FD;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.sidebar-preview-toggle-btn:hover {
+  background: rgba(79, 110, 247, 0.25);
+  border-color: #60A5FA;
+  color: #FFFFFF;
+}
+
+.sidebar-preview-toggle-btn .arrow-icon {
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-preview-toggle-btn.open .arrow-icon {
+  transform: rotate(180deg);
+}
+
+.sidebar-preview-container {
+  display: none;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  border-left: 2px solid rgba(96, 165, 250, 0.4);
+}
+
+.sidebar-preview-container.open {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ============================================================
+   CBT Question Navigator Pills (Evaluasi Akhir Soal 1 s/d 20)
+   ============================================================ */
+.eval-cbt-nav-wrap {
+  background: #FFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.eval-cbt-nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.eval-cbt-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+}
+
+.eval-q-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1.5px solid var(--color-border);
+  background: #F8FAFC;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.eval-q-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.eval-q-pill.answered {
+  background: #DCFCE7;
+  border-color: #16A34A;
+  color: #15803D;
+  font-weight: 800;
+}
+
+.eval-q-pill.active {
+  border-color: #2563EB;
+  background: #EFF6FF;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  color: #1D4ED8;
+}
+
+/* Report Desktop Warning Notice */
+.report-desktop-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-left: 5px solid #2563EB;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  color: #1E3A8A;
+  line-height: 1.5;
 }
 
 /* ============================================================

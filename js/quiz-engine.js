@@ -297,12 +297,111 @@ const QuizEngine = {
     this.renderEvaluasi();
   },
 
+  // Render CBT Question Navigator Strip (Revisi Item 12: Navigasi Nomor Soal 1 s.d. 20)
+  renderCBTNavigator(activeTab) {
+    const pgList = NetLearnStore.evaluasiData.pgList || [];
+    const urList = NetLearnStore.evaluasiData.uraianList || [];
+    const answers = NetLearnStore.state.evaluasiAnswers || {};
+
+    let answeredPG = 0;
+    pgList.forEach((_, i) => {
+      if (answers[`pg_${i}`] !== undefined) answeredPG++;
+    });
+
+    let answeredUr = 0;
+    urList.forEach((_, i) => {
+      if ((answers[`ur_${i}`] || '').trim().length > 0) answeredUr++;
+    });
+
+    const totalAnswered = answeredPG + answeredUr;
+    const totalQuestions = pgList.length + urList.length;
+
+    let pgPillsHtml = pgList.map((_, i) => {
+      const isAns = (answers[`pg_${i}`] !== undefined);
+      return `
+        <button type="button" class="eval-q-pill ${isAns ? 'answered' : ''}" 
+                id="cbt-pill-${i}" 
+                onclick="QuizEngine.jumpToQuestion('pg', ${i})" 
+                title="Pilihan Ganda #${i + 1} (${isAns ? 'Sudah Dijawab' : 'Belum Dijawab'})">
+          ${i + 1}
+        </button>
+      `;
+    }).join('');
+
+    let urPillsHtml = urList.map((_, i) => {
+      const isAns = ((answers[`ur_${i}`] || '').trim().length > 0);
+      const qNum = pgList.length + i + 1;
+      return `
+        <button type="button" class="eval-q-pill ${isAns ? 'answered' : ''}" 
+                id="cbt-pill-${pgList.length + i}" 
+                onclick="QuizEngine.jumpToQuestion('uraian', ${i})" 
+                title="Uraian #${i + 1} / No.${qNum} (${isAns ? 'Sudah Dijawab' : 'Belum Dijawab'})">
+          ${qNum}
+        </button>
+      `;
+    }).join('');
+
+    return `
+      <div class="eval-cbt-nav-wrap">
+        <div class="eval-cbt-nav-header">
+          <span style="font-weight:700; color:var(--color-primary); display:flex; align-items:center; gap:0.4rem;">
+            <span>📋</span> Lembar Jawaban Komputer (CBT Navigasi 20 Soal)
+          </span>
+          <span id="cbt-status-badge" class="badge ${totalAnswered === totalQuestions ? 'badge-success' : 'badge-blue'}">
+            Terjawab: ${totalAnswered} / ${totalQuestions} Soal
+          </span>
+        </div>
+        <div class="eval-cbt-pills-row">
+          ${pgPillsHtml}
+          <div style="width:2px; height:24px; background:var(--color-border); margin:0 4px; align-self:center;"></div>
+          ${urPillsHtml}
+        </div>
+      </div>
+    `;
+  },
+
+  updateCBTStatusBadge() {
+    const pgList = NetLearnStore.evaluasiData.pgList || [];
+    const urList = NetLearnStore.evaluasiData.uraianList || [];
+    const answers = NetLearnStore.state.evaluasiAnswers || {};
+
+    let answered = 0;
+    pgList.forEach((_, i) => {
+      if (answers[`pg_${i}`] !== undefined) answered++;
+    });
+    urList.forEach((_, i) => {
+      if ((answers[`ur_${i}`] || '').trim().length > 0) answered++;
+    });
+
+    const badge = document.getElementById('cbt-status-badge');
+    if (badge) {
+      badge.textContent = `Terjawab: ${answered} / ${pgList.length + urList.length} Soal`;
+      badge.className = `badge ${answered === (pgList.length + urList.length) ? 'badge-success' : 'badge-blue'}`;
+    }
+  },
+
+  jumpToQuestion(tab, idx) {
+    if (NetLearnStore.state.evaluasiActiveTab !== tab) {
+      this.switchEvaluasiTab(tab);
+    }
+    setTimeout(() => {
+      const targetId = (tab === 'pg') ? `eval-q-${idx}` : `eval-ur-${idx}`;
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.transition = 'box-shadow 0.3s ease';
+        el.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.4)';
+        setTimeout(() => { el.style.boxShadow = ''; }, 1000);
+      }
+    }, 60);
+  },
+
   renderEvaluasiPG(container) {
     const list = NetLearnStore.evaluasiData.pgList;
     let questionsHtml = '';
 
     list.forEach((q, idx) => {
-      const userChoice = NetLearnStore.state.evaluasiAnswers[`pg_${idx}`];
+      const userChoice = (NetLearnStore.state.evaluasiAnswers || {})[`pg_${idx}`];
       let optionsHtml = '';
 
       q.options.forEach((opt, optIdx) => {
@@ -317,7 +416,7 @@ const QuizEngine = {
       });
 
       questionsHtml += `
-        <div class="question-box" id="eval-q-${idx}">
+        <div class="question-box" id="eval-q-${idx}" style="margin-bottom:1.25rem;">
           <div class="question-meta">
             <span class="question-number-pill">Soal Pilihan Ganda No. ${idx + 1} dari 15</span>
             <span class="question-points-badge">Bobot: ${q.points} Poin</span>
@@ -329,6 +428,8 @@ const QuizEngine = {
     });
 
     container.innerHTML = `
+      ${this.renderCBTNavigator('pg')}
+
       <div class="tabs-nav" style="margin-bottom: 1.5rem;">
         <button class="tab-btn active" onclick="QuizEngine.switchEvaluasiTab('pg')">
           Bagian 1: Pilihan Ganda (15 Soal)
@@ -337,10 +438,15 @@ const QuizEngine = {
           Bagian 2: Soal Uraian (5 Soal)
         </button>
       </div>
+
       ${questionsHtml}
-      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
-        <button class="btn btn-primary" onclick="QuizEngine.switchEvaluasiTab('uraian')">
-          Lanjut ke Soal Uraian →
+
+      <div style="display: flex; justify-content: space-between; align-items:center; gap: 1rem; margin-top: 2rem; flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="QuizEngine.switchEvaluasiTab('uraian')">
+          Lanjut ke Soal Uraian (No. 16-20) →
+        </button>
+        <button class="btn btn-success btn-lg" onclick="QuizEngine.confirmSubmitEvaluasi()">
+          Selesaikan &amp; Kirim Ujian Evaluasi
         </button>
       </div>
     `;
@@ -351,9 +457,9 @@ const QuizEngine = {
     let questionsHtml = '';
 
     list.forEach((q, idx) => {
-      const userAns = NetLearnStore.state.evaluasiAnswers[`ur_${idx}`] || '';
+      const userAns = (NetLearnStore.state.evaluasiAnswers || {})[`ur_${idx}`] || '';
       questionsHtml += `
-        <div class="question-box" id="eval-ur-${idx}">
+        <div class="question-box" id="eval-ur-${idx}" style="margin-bottom:1.25rem;">
           <div class="question-meta">
             <span class="question-number-pill">Soal Uraian No. ${idx + 1} dari 5 (No. ${16 + idx})</span>
             <span class="question-points-badge">Bobot: ${q.points} Poin</span>
@@ -363,13 +469,15 @@ const QuizEngine = {
             <textarea class="form-control" rows="4" 
                       placeholder="Ketik uraian jawaban Anda secara komprehensif di sini..."
                       oninput="QuizEngine.inputEvaluasiUraian(${idx}, this.value)">${userAns}</textarea>
-            <div class="form-help">Jawaban akan dinilai berdasarkan ketepatan konsep dan kata kunci teknis jaringan.</div>
+            <div class="form-help">Jawaban akan dinilai otomatis berdasarkan ketepatan konsep dan kata kunci teknis jaringan.</div>
           </div>
         </div>
       `;
     });
 
     container.innerHTML = `
+      ${this.renderCBTNavigator('uraian')}
+
       <div class="tabs-nav" style="margin-bottom: 1.5rem;">
         <button class="tab-btn" onclick="QuizEngine.switchEvaluasiTab('pg')">
           Bagian 1: Pilihan Ganda (15 Soal)
@@ -378,32 +486,61 @@ const QuizEngine = {
           Bagian 2: Soal Uraian (5 Soal)
         </button>
       </div>
+
       ${questionsHtml}
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; flex-wrap:wrap; gap:1rem;">
         <button class="btn btn-secondary" onclick="QuizEngine.switchEvaluasiTab('pg')">
-          ← Kembali ke Pilihan Ganda
+          ← Kembali ke Pilihan Ganda (No. 1-15)
         </button>
         <button class="btn btn-success btn-lg" onclick="QuizEngine.confirmSubmitEvaluasi()">
-          Selesaikan & Kirim Ujian Evaluasi
+          Selesaikan &amp; Kirim Ujian Evaluasi
         </button>
       </div>
     `;
   },
 
+  // Revisi Item 12: Pemilihan Opsi Diperbarui In-Place Tanpa Loncat Halaman
   selectEvaluasiPG(qIdx, optIdx) {
+    if (!NetLearnStore.state.evaluasiAnswers) NetLearnStore.state.evaluasiAnswers = {};
     NetLearnStore.state.evaluasiAnswers[`pg_${qIdx}`] = optIdx;
     NetLearnStore.save();
-    this.renderEvaluasi();
+
+    const qBox = document.getElementById(`eval-q-${qIdx}`);
+    if (qBox) {
+      const options = qBox.querySelectorAll('.option-item');
+      options.forEach((optEl, i) => {
+        if (i === optIdx) {
+          optEl.classList.add('selected');
+        } else {
+          optEl.classList.remove('selected');
+        }
+      });
+      const pill = document.getElementById(`cbt-pill-${qIdx}`);
+      if (pill) pill.classList.add('answered');
+      this.updateCBTStatusBadge();
+    } else {
+      this.renderEvaluasi();
+    }
   },
 
   inputEvaluasiUraian(idx, val) {
+    if (!NetLearnStore.state.evaluasiAnswers) NetLearnStore.state.evaluasiAnswers = {};
     NetLearnStore.state.evaluasiAnswers[`ur_${idx}`] = val;
     NetLearnStore.save();
+
+    const pill = document.getElementById(`cbt-pill-${15 + idx}`);
+    if (pill) {
+      if (val && val.trim().length > 0) pill.classList.add('answered');
+      else pill.classList.remove('answered');
+    }
+    this.updateCBTStatusBadge();
   },
 
   confirmSubmitEvaluasi() {
-    const answeredPG = NetLearnStore.evaluasiData.pgList.filter((_, i) => NetLearnStore.state.evaluasiAnswers[`pg_${i}`] !== undefined).length;
-    const answeredUr = NetLearnStore.evaluasiData.uraianList.filter((_, i) => (NetLearnStore.state.evaluasiAnswers[`ur_${i}`] || '').trim().length > 0).length;
+    const answers = NetLearnStore.state.evaluasiAnswers || {};
+    const answeredPG = NetLearnStore.evaluasiData.pgList.filter((_, i) => answers[`pg_${i}`] !== undefined).length;
+    const answeredUr = NetLearnStore.evaluasiData.uraianList.filter((_, i) => (answers[`ur_${i}`] || '').trim().length > 0).length;
 
     const modalTitle = document.getElementById('modal-title');
     const modalBody = document.getElementById('modal-body');
@@ -441,8 +578,9 @@ const QuizEngine = {
 
     // Calculate PG score (15 * 5 = 75 points max)
     let pgScore = 0;
+    const answers = NetLearnStore.state.evaluasiAnswers || {};
     NetLearnStore.evaluasiData.pgList.forEach((q, idx) => {
-      const ans = NetLearnStore.state.evaluasiAnswers[`pg_${idx}`];
+      const ans = answers[`pg_${idx}`];
       if (ans === q.correct) {
         pgScore += q.points;
       }
@@ -451,16 +589,16 @@ const QuizEngine = {
     // Calculate Uraian score (5 * 5 = 25 points max) using keyword rubrics
     let urScore = 0;
     NetLearnStore.evaluasiData.uraianList.forEach((q, idx) => {
-      const text = (NetLearnStore.state.evaluasiAnswers[`ur_${idx}`] || '').toLowerCase();
+      const text = (answers[`ur_${idx}`] || '').toLowerCase();
       if (!text) return;
       const matched = q.keywords.filter(kw => text.includes(kw.toLowerCase()));
-      const matchRatio = matched.length / q.keywords.length;
+      const matchRatio = matched.length / (q.keywords.length || 1);
       if (matchRatio >= 0.5) {
-        urScore += q.points; // Full 5 points if good keyword match
+        urScore += q.points;
       } else if (matchRatio > 0.2) {
-        urScore += 3; // Partial credit
+        urScore += 3;
       } else if (text.length > 20) {
-        urScore += 2; // Effort credit
+        urScore += 2;
       }
     });
 
@@ -471,8 +609,17 @@ const QuizEngine = {
       day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-    // Update or insert in class records
-    const student = NetLearnStore.state.currentUser;
+    // Update or insert in class records (Revisi Item 12: Safe fallback agar tidak pernah error null)
+    const student = NetLearnStore.state.currentUser || NetLearnStore.state.teacherUser || {
+      name: 'Peserta Ujian',
+      nis: '22101',
+      kelas: 'XI TKJ 1'
+    };
+
+    if (!Array.isArray(NetLearnStore.state.studentRecords)) {
+      NetLearnStore.state.studentRecords = [];
+    }
+
     const realLatihanScore = NetLearnStore.getLatihanAnalytics().score;
     let existingRec = NetLearnStore.state.studentRecords.find(r => r.nis === student.nis);
     if (existingRec) {
@@ -498,6 +645,18 @@ const QuizEngine = {
     NetLearnStore.syncCurrentStudentProgress();
     NetLearnStore.save();
     this.renderEvaluasi();
+
+    // Trigger toast and navigate to results screen
+    if (totalScore >= 75) {
+      showToast(`Luar biasa! Anda LULUS dengan nilai ${totalScore} (Tuntas KKM)!`, 'success');
+    } else {
+      showToast(`Nilai Anda ${totalScore} (Di bawah KKM 75). Anda diarahkan ke alur Remedial.`, 'warning');
+    }
+
+    setTimeout(() => {
+      App.navigateTo('hasil');
+    }, 1200);
+  },
 
     // Trigger toast and navigate to results screen
     if (totalScore >= 75) {
