@@ -658,18 +658,6 @@ const QuizEngine = {
     }, 1200);
   },
 
-    // Trigger toast and navigate to results screen
-    if (totalScore >= 75) {
-      showToast(`Luar biasa! Anda LULUS dengan nilai ${totalScore} (Tuntas KKM)!`, 'success');
-    } else {
-      showToast(`Nilai Anda ${totalScore} (Di bawah KKM 75). Anda diarahkan ke alur Remedial.`, 'warning');
-    }
-
-    setTimeout(() => {
-      App.navigateTo('hasil');
-    }, 1200);
-  },
-
   renderEvaluasiResult(container) {
     const score = NetLearnStore.state.evaluasiScore || 0;
     const isPass = (score >= NetLearnStore.evaluasiData.kkm);
