@@ -483,9 +483,10 @@ const App = {
   // Screen 1: Beranda
   // =========================================================================
   renderBeranda() {
-    const modules = NetLearnStore.getModules();
+    const modules = NetLearnStore.getModules() || [];
     const totalMods = modules.length;
-    const completedModules = NetLearnStore.state.materiProgress.filter(Boolean).length;
+    const materiProg = Array.isArray(NetLearnStore.state.materiProgress) ? NetLearnStore.state.materiProgress : [];
+    const completedModules = materiProg.filter(Boolean).length;
     const progressPercent = totalMods > 0 ? Math.round((completedModules / totalMods) * 100) : 0;
 
     const berandaFill = document.getElementById('beranda-progress-fill');
@@ -2984,11 +2985,14 @@ Tuliskan contoh praktikum di sini...
   // Guru / Admin Suite Renders
   // =========================================================================
   renderGuruDashboard() {
-    const records = NetLearnStore.state.studentRecords;
+    const records = Array.isArray(NetLearnStore.state.studentRecords) ? NetLearnStore.state.studentRecords : [];
     const totalStudents = records.length;
     const passedCount = records.filter(r => r.status === 'Tuntas').length;
     const remedialCount = records.filter(r => r.status === 'Remedial').length;
-    const avgScore = Math.round(records.reduce((acc, r) => acc + r.evaluasiScore, 0) / totalStudents);
+    const evaluatedRecords = records.filter(r => typeof r.evaluasiScore === 'number' && !isNaN(r.evaluasiScore));
+    const avgScore = evaluatedRecords.length > 0 
+      ? Math.round(evaluatedRecords.reduce((acc, r) => acc + (r.evaluasiScore || 0), 0) / evaluatedRecords.length) 
+      : 0;
 
     const elTotal = document.getElementById('guru-stat-total');
     const elPassed = document.getElementById('guru-stat-passed');
