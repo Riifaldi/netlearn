@@ -427,37 +427,50 @@ const TopologySim = {
     mount.innerHTML = `
       <!-- Left Column: Problem Objective & Steps -->
       <div class="scenario-info-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-          <div class="scenario-desc-title">
-            <span>🎯</span> ${sc.title}
-          </div>
-          <span class="badge badge-purple" style="font-size:0.7rem;">${sc.badge}</span>
+        <div class="scenario-badge-row">
+          <span class="scenario-level-tag level-${sc.id}">🏷️ ${sc.badge}</span>
+          <span class="scenario-mode-tag">Simulasi Mandiri</span>
         </div>
-        
-        <p class="scenario-desc-text">
-          ${sc.objective}
-        </p>
 
-        <div style="font-size:0.78rem; font-weight:700; color:#38BDF8; margin-bottom:0.4rem;">
-          Langkah Pengerjaan Mandiri Siswa:
+        <h3 class="scenario-main-heading">
+          <span class="heading-icon">🎯</span>
+          <span>${sc.title}</span>
+        </h3>
+        
+        <div class="scenario-objective-card">
+          <div class="objective-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>Tujuan Praktikum:</span>
+          </div>
+          <p class="scenario-desc-text">
+            ${sc.objective}
+          </p>
         </div>
-        <ul class="scenario-steps-list">
-          ${sc.instructions.map((step, idx) => `
-            <li>
-              <span style="color:#38BDF8; font-weight:700;">${idx + 1}.</span>
-              <span>${step}</span>
-            </li>
-          `).join('')}
-        </ul>
+
+        <div class="scenario-steps-section">
+          <div class="steps-heading">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <span>Langkah Pengerjaan Mandiri:</span>
+          </div>
+          <ol class="scenario-steps-list">
+            ${sc.instructions.map((step, idx) => `
+              <li class="scenario-step-item">
+                <span class="step-num-badge">${idx + 1}</span>
+                <span class="step-content">${step}</span>
+              </li>
+            `).join('')}
+          </ol>
+        </div>
       </div>
 
       <!-- Right Column: Fixed Reference Configuration Table (Read-Only) -->
       <div class="scenario-info-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-          <div class="scenario-desc-title">
-            <span>📊</span> Tabel Ketentuan Konfigurasi Alat (Acuan Siswa)
+        <div class="scenario-table-header">
+          <div class="table-header-title">
+            <span>📊</span>
+            <span>Tabel Ketentuan Konfigurasi Alat (Acuan Siswa)</span>
           </div>
-          <span style="font-size:0.68rem; color:#94A3B8; font-style:italic;">Bersifat Tetap / Acuan Resmi</span>
+          <span class="table-status-badge">Acuan Resmi Tetap</span>
         </div>
 
         <div class="scenario-ref-table-wrapper">
@@ -473,22 +486,54 @@ const TopologySim = {
               </tr>
             </thead>
             <tbody>
-              ${sc.referenceTable.map(row => `
-                <tr>
-                  <td><strong>${row.device}</strong></td>
-                  <td class="badge-cell"><span class="badge badge-blue" style="font-size:0.68rem;">${row.type}</span></td>
-                  <td style="color:#38BDF8;">${row.targetIp}</td>
-                  <td>${row.netmask}</td>
-                  <td>${row.gateway}</td>
-                  <td class="badge-cell" style="color:#CBD5E1; font-size:0.72rem;">${row.note}</td>
-                </tr>
-              `).join('')}
+              ${sc.referenceTable.map(row => {
+                const typeLower = (row.type || '').toLowerCase();
+                const isSwitch = typeLower.includes('switch');
+                const isRouter = typeLower.includes('router');
+                const isServer = typeLower.includes('server');
+                const isLaptop = typeLower.includes('laptop');
+                const typeClass = isSwitch ? 'type-switch' : (isRouter ? 'type-router' : (isServer ? 'type-server' : (isLaptop ? 'type-laptop' : 'type-pc')));
+                const isLayer2 = (row.targetIp === 'Layer 2' || row.targetIp === '-');
+
+                return `
+                  <tr>
+                    <td class="col-device">
+                      <div class="device-cell">
+                        <span class="device-dot ${typeClass}"></span>
+                        <span class="device-name">${row.device}</span>
+                      </div>
+                    </td>
+                    <td class="col-type">
+                      <span class="device-tag ${typeClass}">${row.type}</span>
+                    </td>
+                    <td class="col-ip">
+                      ${isLayer2 
+                        ? `<span class="tag-layer2">Layer 2 (Tanpa IP)</span>` 
+                        : `<code class="code-ip">${row.targetIp}</code>`}
+                    </td>
+                    <td class="col-mask">
+                      ${row.netmask !== '-' 
+                        ? `<code class="code-mask">${row.netmask}</code>` 
+                        : `<span class="dash-muted">-</span>`}
+                    </td>
+                    <td class="col-gw">
+                      ${(row.gateway && row.gateway !== '-') 
+                        ? `<code class="code-gw">${row.gateway}</code>` 
+                        : `<span class="dash-muted">-</span>`}
+                    </td>
+                    <td class="col-note">
+                      <span class="note-text">${row.note}</span>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
             </tbody>
           </table>
         </div>
 
-        <div style="margin-top:0.65rem; font-size:0.72rem; color:#94A3B8; display:flex; align-items:center; gap:0.4rem;">
-          <span>ℹ️</span> <em>Catatan: Tabel ini adalah spesifikasi acuan pengembang. Siswa harus menginput nilai-nilai di atas ke dalam masing-masing alat di kanvas bawah.</em>
+        <div class="scenario-table-footer-notice">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span><strong>Petunjuk Praktik:</strong> Tabel di atas adalah spesifikasi resmi. Klik masing-masing alat di kanvas bawah, lalu input parameter Alamat IP dan Subnet Mask sesuai acuan di atas!</span>
         </div>
       </div>
     `;
@@ -563,8 +608,9 @@ const TopologySim = {
     const devicesNeedingIp = this.devices.filter(d => d.type !== 'switch');
     if (devicesNeedingIp.length === 0) {
       badge.innerHTML = `📊 Progres Konfigurasi: 0 Alat`;
-      badge.style.background = '#EFF6FF';
-      badge.style.color = '#1D4ED8';
+      badge.style.background = 'rgba(59, 130, 246, 0.15)';
+      badge.style.color = '#93C5FD';
+      badge.style.borderColor = 'rgba(59, 130, 246, 0.35)';
       return;
     }
 
@@ -574,13 +620,13 @@ const TopologySim = {
 
     badge.innerHTML = `📊 Konfigurasi Siswa: ${configured}/${total} Alat Terisi (${percent}%)`;
     if (configured === total) {
-      badge.style.background = '#ECFDF5';
-      badge.style.borderColor = '#A7F3D0';
-      badge.style.color = '#047857';
+      badge.style.background = 'rgba(16, 185, 129, 0.18)';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.45)';
+      badge.style.color = '#34D399';
     } else {
-      badge.style.background = '#EFF6FF';
-      badge.style.borderColor = '#BFDBFE';
-      badge.style.color = '#1D4ED8';
+      badge.style.background = 'rgba(59, 130, 246, 0.15)';
+      badge.style.borderColor = 'rgba(59, 130, 246, 0.35)';
+      badge.style.color = '#93C5FD';
     }
   },
 
